@@ -1,0 +1,23 @@
+.theatre-bottom {
+  /* scene-specific overrides */
+}
+
+.tape-img {
+  /* hook for future styling (opacity, filter, hover, etc.) */
+}
+
+.content-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none; /* set to auto per-child once real buttons/signs land */
+}
+
+.sign-zone {
+  flex: 6;
+}
+
+.button-zone {
+  flex: 3;
+}
