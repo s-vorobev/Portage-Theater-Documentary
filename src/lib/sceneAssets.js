@@ -1,6 +1,11 @@
+export const BACKGROUNDS = {
+  theatreTop: { src: '/theatre_top.png', width: 6010, height: 2580 },
+  theatreBottom: { src: '/theatre_bottom.png', width: 6010, height: 2580 },
+};
+
 export const ASSETS = {
   cautionTape: {
-    src: "/caution_tape.png",
+    src: '/caution_tape.png',
     nativeWidth: 1280,
     nativeHeight: 720,
   },

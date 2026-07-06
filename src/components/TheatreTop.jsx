@@ -1,14 +1,16 @@
-import TheatreScene from "./scene/TheatreScene";
+import TheatreScene from './scene/TheatreScene'
+import { BACKGROUNDS } from '../lib/sceneAssets'
 
 function TheatreTop() {
+  const bg = BACKGROUNDS.theatreTop
   return (
     <TheatreScene
       className="theatre-top"
-      bgSrc="/theatre_top.png"
-      bgWidth={6010}
-      bgHeight={2580}
+      bgSrc={bg.src}
+      bgWidth={bg.width}
+      bgHeight={bg.height}
     />
-  );
+  )
 }
 
-export default TheatreTop;
+export default TheatreTop
