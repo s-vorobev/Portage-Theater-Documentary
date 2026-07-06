@@ -6,7 +6,6 @@ A React front end application for the Portage Theatre Documentary website. Built
 
 - **React** — UI component library
 - **Vite** — build tool and dev server with HMR
-- **React Router** — client-side routing
 - **Framer Motion** — animations and page transitions
 - **ESLint** — code quality checks enforced on every PR
 
