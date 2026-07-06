@@ -1,7 +1,7 @@
 export const BACKGROUNDS = {
   theatreTop: { src: '/theatre_top.png', width: 6010, height: 2580 },
   theatreBottom: { src: '/theatre_bottom.png', width: 6010, height: 2580 },
-};
+}
 
 export const ASSETS = {
   cautionTape: {
@@ -9,16 +9,16 @@ export const ASSETS = {
     nativeWidth: 1280,
     nativeHeight: 720,
   },
-};
+}
 
 export function placeAsset(
   asset,
   { centerX, centerY, scale = 1, rotateDeg = 0 },
 ) {
-  const width = asset.nativeWidth * scale;
-  const height = asset.nativeHeight * scale;
-  const x = centerX - width / 2;
-  const y = centerY - height / 2;
+  const width = asset.nativeWidth * scale
+  const height = asset.nativeHeight * scale
+  const x = centerX - width / 2
+  const y = centerY - height / 2
   return {
     href: asset.src,
     x,
@@ -28,5 +28,5 @@ export function placeAsset(
     transform: rotateDeg
       ? `rotate(${rotateDeg} ${centerX} ${centerY})`
       : undefined,
-  };
+  }
 }
