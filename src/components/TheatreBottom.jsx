@@ -11,8 +11,22 @@ function TheatreBottom() {
       bgWidth={bg.width}
       bgHeight={bg.height}
     >
-      <SceneAsset asset={ASSETS.cautionTape} centerX={3005} centerY={1985} scale={4.8} rotateDeg={6} className="tape-img" />
-      <SceneAsset asset={ASSETS.cautionTape} centerX={3005} centerY={1985} scale={4.8} rotateDeg={-6} className="tape-img" />
+      <SceneAsset
+        asset={ASSETS.cautionTape}
+        centerX={3005}
+        centerY={1985}
+        scale={4.8}
+        rotateDeg={6}
+        className="tape-img"
+      />
+      <SceneAsset
+        asset={ASSETS.cautionTape}
+        centerX={3005}
+        centerY={1985}
+        scale={4.8}
+        rotateDeg={-6}
+        className="tape-img"
+      />
     </TheatreScene>
   )
 }

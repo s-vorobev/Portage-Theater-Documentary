@@ -1,4 +1,4 @@
-import { placeAsset } from "../../lib/sceneAssets";
+import { placeAsset } from '../../lib/sceneAssets'
 
 function SceneAsset({
   asset,
@@ -13,7 +13,7 @@ function SceneAsset({
     centerY,
     scale,
     rotateDeg,
-  });
+  })
   return (
     <image
       href={href}
@@ -24,7 +24,7 @@ function SceneAsset({
       height={height}
       transform={transform}
     />
-  );
+  )
 }
 
-export default SceneAsset;
+export default SceneAsset
