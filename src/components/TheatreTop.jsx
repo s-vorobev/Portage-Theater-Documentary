@@ -1,4 +1,4 @@
-import TheatreScene from './scene/TheatreScene'
+import TheatreScene from "./scene/TheatreScene";
 
 function TheatreTop() {
   return (
@@ -8,7 +8,7 @@ function TheatreTop() {
       bgWidth={6010}
       bgHeight={2580}
     />
-  )
+  );
 }
 
-export default TheatreTop
+export default TheatreTop;

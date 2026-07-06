@@ -1,6 +1,6 @@
-import './App.css'
-import TheatreTop from './components/TheatreTop'
-import TheatreBottom from './components/TheatreBottom'
+import "./App.css";
+import TheatreTop from "./components/TheatreTop";
+import TheatreBottom from "./components/TheatreBottom";
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
       <TheatreTop />
       <TheatreBottom />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
