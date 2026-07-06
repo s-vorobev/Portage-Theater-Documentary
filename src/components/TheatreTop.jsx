@@ -1,4 +1,3 @@
-import './TheatreTop.css'
 import TheatreScene from './scene/TheatreScene'
 
 function TheatreTop() {
