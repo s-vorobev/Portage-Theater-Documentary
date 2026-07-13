@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export default function App() {
-  const [isOpen, setIsOpen] = useState(false);
-
   const styles = {
     container: {
       position: 'relative',
@@ -20,7 +18,6 @@ export default function App() {
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     },
-    // New Video Layer
     videoLayer: {
       position: 'absolute',
       width: '100%',
@@ -36,10 +33,6 @@ export default function App() {
       backgroundImage: 'url("https://images.unsplash.com/photo-1514306193469-f380741d167f?q=80&w=2000")',
       backgroundSize: 'cover',
       backgroundPosition: '50% 0%',
-      transition: 'clip-path 1.5s ease-in-out',
-      clipPath: isOpen 
-        ? 'polygon(0% 0%, 100% 0%, 100% 40%, 50% 60%, 0% 40%)'
-        : 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
     },
     uiLayer: {
       position: 'absolute',
@@ -71,7 +64,6 @@ export default function App() {
     <div style={styles.container}>
       <div style={styles.bgLayer}></div>
       
-      {/* Video Layer placed between bg and theater */}
       <video 
         style={styles.videoLayer}
         src="https://cdn.pixabay.com/video/2022/11/13/138891-770540401_large.mp4"
@@ -85,19 +77,28 @@ export default function App() {
 
       <div style={styles.uiLayer}>
         <div style={styles.buttonContainer}>
-          <button 
+          <a 
+            href="https://www.gofundme.com/f/a-documentary-on-the-portage-theaters-revival" 
+            target="_blank" 
+            rel="noopener noreferrer"
             style={{ 
-              padding: '20px 40px', fontSize: '1.2rem', cursor: 'pointer', 
-              background: '#facc15', border: 'none', borderRadius: '4px', fontWeight: 'bold',
+              display: 'inline-block',
+              padding: '20px 40px', 
+              fontSize: '1.2rem', 
+              textDecoration: 'none',
+              color: 'white',
+              background: '#dc2626', // Solid red
+              border: 'none', 
+              borderRadius: '0px', // No rounded edges
+              fontWeight: 'bold',
               boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
               transition: 'transform 0.3s ease-out' 
             }}
             onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
             onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
-            onClick={() => setIsOpen(!isOpen)}
           >
-            {isOpen ? 'Close Documentary' : 'Donate'}
-          </button>
+            DONATE
+          </a>
         </div>
         <div style={styles.cautionTape}></div>
       </div>
