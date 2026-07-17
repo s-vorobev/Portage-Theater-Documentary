@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import TheatreScene from './scene/TheatreScene'
 import SceneAsset from './scene/SceneAsset'
 import Form from './Form'
@@ -5,6 +6,7 @@ import { BACKGROUNDS, ASSETS } from '../lib/sceneAssets'
 
 function Theatre() {
   const bg = BACKGROUNDS.theatre
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   return (
     <TheatreScene
@@ -12,14 +14,16 @@ function Theatre() {
       bgSrc={bg.src}
       bgWidth={bg.width}
       bgHeight={bg.height}
-      overlay={<Form />}
+      overlay={<Form isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />}
     >
       <SceneAsset
         asset={ASSETS.donateNow}
         centerX={1227}
         centerY={1895}
         scale={2.33}
-        onClick={() => console.log('donate now clicked')}
+        onClick={() =>
+          window.open('https://gofund.me/a7746a6de', '_blank', 'noopener,noreferrer')
+        }
         className="scene-button"
       />
       <SceneAsset
@@ -27,7 +31,7 @@ function Theatre() {
         centerX={2655}
         centerY={1898}
         scale={2.36}
-        onClick={() => console.log('contact us clicked')}
+        onClick={() => setIsFormOpen(true)}
         className="scene-button"
       />
       <SceneAsset
