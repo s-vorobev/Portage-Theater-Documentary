@@ -1,14 +1,12 @@
 import './App.css'
-import TheatreTop from './components/TheatreTop'
-import TheatreBottom from './components/TheatreBottom'
-import Form from './components/Form'
+import Theatre from './components/Theatre'
+import Footage from './components/Footage'
 
 function App() {
   return (
     <div className="scroll-container">
-      <TheatreTop />
-      <Form />
-      <TheatreBottom />
+      <Theatre />
+      <Footage />
     </div>
   )
 }
