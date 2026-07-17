@@ -14,7 +14,9 @@ function Theatre() {
       bgSrc={bg.src}
       bgWidth={bg.width}
       bgHeight={bg.height}
-      overlay={<Form isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />}
+      overlay={
+        <Form isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
+      }
     >
       <SceneAsset
         asset={ASSETS.donateNow}
@@ -22,7 +24,11 @@ function Theatre() {
         centerY={1895}
         scale={2.33}
         onClick={() =>
-          window.open('https://gofund.me/a7746a6de', '_blank', 'noopener,noreferrer')
+          window.open(
+            'https://gofund.me/a7746a6de',
+            '_blank',
+            'noopener,noreferrer',
+          )
         }
         className="scene-button"
       />

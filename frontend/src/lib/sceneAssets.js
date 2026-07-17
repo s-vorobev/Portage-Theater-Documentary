@@ -27,7 +27,10 @@ export const ASSETS = {
   },
 }
 
-export function placeAsset(asset, { centerX, centerY, scale = 1, rotateDeg = 0 }) {
+export function placeAsset(
+  asset,
+  { centerX, centerY, scale = 1, rotateDeg = 0 },
+) {
   const width = asset.nativeWidth * scale
   const height = asset.nativeHeight * scale
   const x = centerX - width / 2
@@ -40,6 +43,8 @@ export function placeAsset(asset, { centerX, centerY, scale = 1, rotateDeg = 0 }
     y,
     width,
     height,
-    transform: rotateDeg ? `rotate(${rotateDeg} ${centerX} ${centerY})` : undefined,
+    transform: rotateDeg
+      ? `rotate(${rotateDeg} ${centerX} ${centerY})`
+      : undefined,
   }
 }

@@ -23,7 +23,8 @@ function countWords(text) {
 
 function formatBytes(bytes) {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}KB`
-  if (bytes < 1024 * 1024 * 1024) return `${Math.round(bytes / (1024 * 1024))}MB`
+  if (bytes < 1024 * 1024 * 1024)
+    return `${Math.round(bytes / (1024 * 1024))}MB`
   return `${Math.round(bytes / (1024 * 1024 * 1024))}GB`
 }
 
@@ -112,7 +113,11 @@ function Form({ isOpen, onClose }) {
   return (
     <div className="form-overlay" onClick={onClose}>
       <div className="form-container" onClick={(e) => e.stopPropagation()}>
-        <button className="form-close" onClick={onClose} aria-label="Close form">
+        <button
+          className="form-close"
+          onClick={onClose}
+          aria-label="Close form"
+        >
           ×
         </button>
 
@@ -124,17 +129,35 @@ function Form({ isOpen, onClose }) {
           <div className="form-row">
             <div className="form-field">
               <label htmlFor="fname">First name</label>
-              <input type="text" id="fname" name="fname" maxLength={50} required />
+              <input
+                type="text"
+                id="fname"
+                name="fname"
+                maxLength={50}
+                required
+              />
             </div>
             <div className="form-field">
               <label htmlFor="lname">Last name</label>
-              <input type="text" id="lname" name="lname" maxLength={50} required />
+              <input
+                type="text"
+                id="lname"
+                name="lname"
+                maxLength={50}
+                required
+              />
             </div>
           </div>
 
           <div className="form-field">
             <label htmlFor="email">Email</label>
-            <input type="email" id="email" name="email" maxLength={100} required />
+            <input
+              type="email"
+              id="email"
+              name="email"
+              maxLength={100}
+              required
+            />
           </div>
 
           <div className="form-field">
@@ -172,7 +195,8 @@ function Form({ isOpen, onClose }) {
               onChange={handleFileChange}
             />
             <span className="field-hint">
-              {files.length} / {MAX_FILES} files · max {formatBytes(MAX_FILE_SIZE_BYTES)} each
+              {files.length} / {MAX_FILES} files · max{' '}
+              {formatBytes(MAX_FILE_SIZE_BYTES)} each
             </span>
             {fileError && <span className="field-error">{fileError}</span>}
 
