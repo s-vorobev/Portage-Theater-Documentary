@@ -1,5 +1,5 @@
 export const BACKGROUNDS = {
-  theatre: { src: '/theatre_desktop.png', width: 3914, height: 2447 },
+  theatre: { src: '/theatre_desktop.png', width: 3914, height: 1957 },
   // theatre_mobile.png
 }
 

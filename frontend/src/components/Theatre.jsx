@@ -18,11 +18,26 @@ function Theatre() {
         <Form isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
       }
     >
+      {/* TEMPORARY TEXT */}
+      <text
+        x={bg.width / 2}
+        y={180}
+        textAnchor="middle"
+        style={{
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: '150px',
+          fill: 'white',
+          letterSpacing: '10px',
+        }}
+      >
+        The Documentary.
+      </text>
+
       <SceneAsset
         asset={ASSETS.donateNow}
-        centerX={1227}
-        centerY={1895}
-        scale={2.33}
+        centerX={1379}
+        centerY={1516}
+        scale={1.84}
         onClick={() =>
           window.open(
             'https://gofund.me/a7746a6de',
@@ -34,18 +49,22 @@ function Theatre() {
       />
       <SceneAsset
         asset={ASSETS.contactUs}
-        centerX={2655}
-        centerY={1898}
-        scale={2.36}
+        centerX={2508}
+        centerY={1519}
+        scale={1.86}
         onClick={() => setIsFormOpen(true)}
         className="scene-button"
       />
       <SceneAsset
         asset={ASSETS.viewOurProgress}
         centerX={1957}
-        centerY={2150}
-        scale={3.85}
-        onClick={() => console.log('view our progress clicked')}
+        centerY={1720}
+        scale={3.45}
+        onClick={() =>
+          document
+            .getElementById('footage')
+            ?.scrollIntoView({ behavior: 'smooth' })
+        }
         className="scene-button"
       />
     </TheatreScene>
