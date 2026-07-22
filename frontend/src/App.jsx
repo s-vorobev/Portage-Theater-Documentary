@@ -1,11 +1,11 @@
 import './App.css'
-import Theatre from './components/Theatre'
+import Theater from './components/Theater'
 import Footage from './components/Footage'
 
 function App() {
   return (
     <div className="scroll-container">
-      <Theatre />
+      <Theater />
       <Footage />
     </div>
   )
