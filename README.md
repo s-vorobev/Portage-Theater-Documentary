@@ -44,8 +44,8 @@ Create `frontend/.env` (see `frontend/.env.example`):
 VITE_API_URL=http://localhost:3001
 ```
 
-| Variable | Required | Description |
-|---|---|---|
+| Variable       | Required                                 | Description                                                                                                                                                   |
+| -------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `VITE_API_URL` | No — defaults to `http://localhost:3001` | Base URL of the backend API. Must be prefixed with `VITE_` for Vite to expose it to the browser bundle. Update this per environment (dev/prod) when deployed. |
 
 ### Scripts
@@ -99,16 +99,16 @@ DROPBOX_UPLOAD_FOLDER=/submissions-dev
 FRONTEND_URL=http://localhost:5173
 ```
 
-| Variable | Required | Description |
-|---|---|---|
-| `PORT` | No — defaults to `3001` | Port the Express server listens on. |
-| `NODE_ENV` | No — defaults to `development` | `development`, `production`, or `test`. |
-| `DATABASE_URL` | **Yes** | Postgres connection string. Locally, use Railway's `DATABASE_PUBLIC_URL` value for the dev database — the plain `DATABASE_URL` Railway shows is only reachable from inside Railway's network, not from your machine. |
-| `DROPBOX_APP_KEY` | **Yes** | From the Dropbox App Console, under your app's Settings tab. |
-| `DROPBOX_APP_SECRET` | **Yes** | Same location — click "Show" to reveal it. |
-| `DROPBOX_REFRESH_TOKEN` | **Yes** | Obtained via a one-time OAuth authorization flow. Does not expire under normal use. See team docs for the exact steps if you need to generate a new one. |
-| `DROPBOX_UPLOAD_FOLDER` | No — defaults to `/submissions` | Folder path in Dropbox where uploaded media is stored. |
-| `FRONTEND_URL` | No — defaults to `http://localhost:5173` | Used for CORS — must match wherever the frontend is actually running, or browser requests to the API will be blocked. |
+| Variable                | Required                                 | Description                                                                                                                                                                                                          |
+| ----------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PORT`                  | No — defaults to `3001`                  | Port the Express server listens on.                                                                                                                                                                                  |
+| `NODE_ENV`              | No — defaults to `development`           | `development`, `production`, or `test`.                                                                                                                                                                              |
+| `DATABASE_URL`          | **Yes**                                  | Postgres connection string. Locally, use Railway's `DATABASE_PUBLIC_URL` value for the dev database — the plain `DATABASE_URL` Railway shows is only reachable from inside Railway's network, not from your machine. |
+| `DROPBOX_APP_KEY`       | **Yes**                                  | From the Dropbox App Console, under your app's Settings tab.                                                                                                                                                         |
+| `DROPBOX_APP_SECRET`    | **Yes**                                  | Same location — click "Show" to reveal it.                                                                                                                                                                           |
+| `DROPBOX_REFRESH_TOKEN` | **Yes**                                  | Obtained via a one-time OAuth authorization flow. Does not expire under normal use. See team docs for the exact steps if you need to generate a new one.                                                             |
+| `DROPBOX_UPLOAD_FOLDER` | No — defaults to `/submissions`          | Folder path in Dropbox where uploaded media is stored.                                                                                                                                                               |
+| `FRONTEND_URL`          | No — defaults to `http://localhost:5173` | Used for CORS — must match wherever the frontend is actually running, or browser requests to the API will be blocked.                                                                                                |
 
 Run `sql/schema.sql` once against a fresh Postgres database before the API can store anything — it's not run automatically. Easiest via Railway's Postgres service → Data/query console → paste and execute the file's contents.
 
