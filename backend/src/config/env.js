@@ -12,7 +12,9 @@ const envSchema = z.object({
   DROPBOX_UPLOAD_FOLDER: z.string().min(1).default('/submissions-dev'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
 
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
 })
 
 const parsed = envSchema.safeParse(process.env)

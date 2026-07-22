@@ -23,7 +23,7 @@ app.use((err, req, res, next) => {
 
   if (err instanceof multer.MulterError) {
     const messages = {
-       LIMIT_FILE_SIZE:
+      LIMIT_FILE_SIZE:
         'One of your files is too large. You can email your submission to footage@portagetheaterdocumentary.com instead.',
       LIMIT_FILE_COUNT:
         'Too many files. You can email your submission to footage@portagetheaterdocumentary.com instead.',
@@ -37,6 +37,7 @@ app.use((err, req, res, next) => {
 
   const status = err.status || 500
   res.status(status).json({
-    error: status === 500 ? 'Something went wrong. Please try again.' : err.message,
+    error:
+      status === 500 ? 'Something went wrong. Please try again.' : err.message,
   })
 })

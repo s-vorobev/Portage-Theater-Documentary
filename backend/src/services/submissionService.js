@@ -20,8 +20,9 @@ const ACCEPTED_TYPES = [
 ]
 
 export async function createSubmission(data, uploadedFiles = [], ipAddress) {
-
-  const invalidType = uploadedFiles.filter((f) => !ACCEPTED_TYPES.includes(f.mimetype))
+  const invalidType = uploadedFiles.filter(
+    (f) => !ACCEPTED_TYPES.includes(f.mimetype),
+  )
   if (invalidType.length > 0) {
     throw new HttpError(
       400,
@@ -31,7 +32,10 @@ export async function createSubmission(data, uploadedFiles = [], ipAddress) {
 
   const totalBytes = uploadedFiles.reduce((sum, f) => sum + f.size, 0)
   if (totalBytes > MAX_TOTAL_SIZE_BYTES) {
-    throw new HttpError(400, 'Total attachments must be under 3GB. Please remove some files.')
+    throw new HttpError(
+      400,
+      'Total attachments must be under 3GB. Please remove some files.',
+    )
   }
 
   const uploadedPaths = []
@@ -54,9 +58,15 @@ export async function createSubmission(data, uploadedFiles = [], ipAddress) {
       )
     }
   } catch (err) {
-    console.error('Dropbox upload failed, rolling back already-uploaded files:', err)
+    console.error(
+      'Dropbox upload failed, rolling back already-uploaded files:',
+      err,
+    )
     await Promise.allSettled(uploadedPaths.map((path) => deleteFile(path)))
-    throw new HttpError(502, 'Failed to upload one or more files. Please try again.')
+    throw new HttpError(
+      502,
+      'Failed to upload one or more files. Please try again.',
+    )
   }
 
   const submission = new Submission({
@@ -69,11 +79,20 @@ export async function createSubmission(data, uploadedFiles = [], ipAddress) {
   })
 
   try {
-    const submissionId = await insertSubmissionWithFiles(submission, fileRecords)
+    const submissionId = await insertSubmissionWithFiles(
+      submission,
+      fileRecords,
+    )
     return submissionId
   } catch (err) {
-    console.error('DB insert failed after successful upload, rolling back Dropbox files:', err)
+    console.error(
+      'DB insert failed after successful upload, rolling back Dropbox files:',
+      err,
+    )
     await Promise.allSettled(uploadedPaths.map((path) => deleteFile(path)))
-    throw new HttpError(500, 'Failed to save your submission. Please try again.')
+    throw new HttpError(
+      500,
+      'Failed to save your submission. Please try again.',
+    )
   }
 }

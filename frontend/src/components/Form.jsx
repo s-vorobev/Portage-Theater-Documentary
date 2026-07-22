@@ -6,7 +6,6 @@ const MAX_FILES = 10
 const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024 // 500MB per file
 const MAX_TOTAL_SIZE_BYTES = 3 * 1024 * 1024 * 1024 // 3GB total per submission
 
-
 const ACCEPTED_TYPES = [
   'image/jpeg',
   'image/png',
@@ -51,7 +50,11 @@ function Form({ isOpen, onClose }) {
   const wordCount = countWords(message)
 
   const isFormValid =
-    firstName.trim() && lastName.trim() && email.trim() && message.trim() && !fileError
+    firstName.trim() &&
+    lastName.trim() &&
+    email.trim() &&
+    message.trim() &&
+    !fileError
 
   function handleMessageChange(e) {
     const value = e.target.value
@@ -128,13 +131,18 @@ function Form({ isOpen, onClose }) {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setFormError(data.error || 'Something went wrong submitting your form. Please try again.')
+        setFormError(
+          data.error ||
+            'Something went wrong submitting your form. Please try again.',
+        )
         return
       }
 
       setIsSuccess(true)
     } catch (err) {
-      setFormError('Something went wrong submitting your form. Please try again.')
+      setFormError(
+        'Something went wrong submitting your form. Please try again.',
+      )
     } finally {
       setIsSubmitting(false)
     }
