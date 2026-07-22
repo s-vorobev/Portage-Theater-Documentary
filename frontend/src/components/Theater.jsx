@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import TheatreScene from './scene/TheatreScene'
+import TheaterScene from './scene/TheaterScene'
 import SceneAsset from './scene/SceneAsset'
 import Form from './Form'
 import { BACKGROUNDS, ASSETS } from '../lib/sceneAssets'
 
-function Theatre() {
-  const bg = BACKGROUNDS.theatre
+function Theater() {
+  const bg = BACKGROUNDS.theater
   const [isFormOpen, setIsFormOpen] = useState(false)
 
   return (
-    <TheatreScene
-      className="theatre"
+    <TheaterScene
+      className="theater"
       bgSrc={bg.src}
       bgWidth={bg.width}
       bgHeight={bg.height}
@@ -67,8 +67,8 @@ function Theatre() {
         }
         className="scene-button"
       />
-    </TheatreScene>
+    </TheaterScene>
   )
 }
 
-export default Theatre
+export default Theater
