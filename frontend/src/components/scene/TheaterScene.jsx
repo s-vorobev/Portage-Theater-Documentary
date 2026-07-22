@@ -1,6 +1,6 @@
-import './TheatreScene.css'
+import './TheaterScene.css'
 
-function TheatreScene({
+function TheaterScene({
   bgSrc,
   bgWidth,
   bgHeight,
@@ -19,4 +19,4 @@ function TheatreScene({
   )
 }
 
-export default TheatreScene
+export default TheaterScene
