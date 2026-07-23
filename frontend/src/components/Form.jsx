@@ -138,6 +138,7 @@ function Form({ isOpen, onClose }) {
       setIsSuccess(true)
     } catch (err) {
       setFormError('Something went wrong submitting your form. Please try again.')
+      console.log(err)
     } finally {
       setIsSubmitting(false)
     }
