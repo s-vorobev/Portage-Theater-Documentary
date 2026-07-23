@@ -37,6 +37,7 @@ app.use((err, req, res, _next) => {
 
   const status = err.status || 500
   res.status(status).json({
-    error: status === 500 ? 'Something went wrong. Please try again.' : err.message,
+    error:
+      status === 500 ? 'Something went wrong. Please try again.' : err.message,
   })
 })
