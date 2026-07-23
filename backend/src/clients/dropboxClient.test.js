@@ -1,13 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const mockFilesUpload = vi.fn()
-const mockFilesDeleteV2 = vi.fn()
+const { mockFilesUpload, mockFilesDeleteV2 } = vi.hoisted(() => ({
+  mockFilesUpload: vi.fn(),
+  mockFilesDeleteV2: vi.fn(),
+}))
 
 vi.mock('dropbox', () => ({
-  Dropbox: vi.fn().mockImplementation(() => ({
-    filesUpload: mockFilesUpload,
-    filesDeleteV2: mockFilesDeleteV2,
-  })),
+  Dropbox: vi.fn().mockImplementation(function () {
+    return {
+      filesUpload: mockFilesUpload,
+      filesDeleteV2: mockFilesDeleteV2,
+    }
+  }),
 }))
 
 vi.mock('../config/env.js', () => ({
