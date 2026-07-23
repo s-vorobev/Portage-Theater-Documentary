@@ -14,7 +14,8 @@ vi.mock('../db/pool.js', () => ({
 vi.mock('../db/sql/loader.js', () => ({
   queries: {
     insertSubmission: 'INSERT INTO submissions (...) RETURNING submission_id;',
-    insertSubmissionFile: 'INSERT INTO submission_files (...) RETURNING file_id;',
+    insertSubmissionFile:
+      'INSERT INTO submission_files (...) RETURNING file_id;',
   },
 }))
 
@@ -111,9 +112,9 @@ describe('insertSubmissionWithFiles', () => {
       return Promise.resolve({ rows: [] })
     })
 
-    await expect(
-      insertSubmissionWithFiles(submission, files),
-    ).rejects.toThrow('constraint violation')
+    await expect(insertSubmissionWithFiles(submission, files)).rejects.toThrow(
+      'constraint violation',
+    )
 
     const calledSql = mockClient.query.mock.calls.map((call) => call[0])
     expect(calledSql).toContain('ROLLBACK')

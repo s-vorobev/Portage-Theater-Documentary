@@ -27,7 +27,11 @@ describe('submitForm', () => {
   })
 
   it('returns 400 with field errors when the body fails validation, without calling the service', async () => {
-    const req = { body: { ...validBody, email: 'not-an-email' }, files: [], ip: '127.0.0.1' }
+    const req = {
+      body: { ...validBody, email: 'not-an-email' },
+      files: [],
+      ip: '127.0.0.1',
+    }
     const res = makeRes()
 
     await submitForm(req, res)
@@ -48,7 +52,10 @@ describe('submitForm', () => {
     await submitForm(req, res)
 
     expect(createSubmission).toHaveBeenCalledWith(
-      expect.objectContaining({ firstName: 'Sergei', email: 'sergei@example.com' }),
+      expect.objectContaining({
+        firstName: 'Sergei',
+        email: 'sergei@example.com',
+      }),
       files,
       '203.0.113.5',
     )

@@ -96,9 +96,12 @@ describe('useIsMobile', () => {
   it('re-subscribes when the breakpoint changes', () => {
     mockMatchMedia(false)
 
-    const { rerender } = renderHook(({ breakpoint }) => useIsMobile(breakpoint), {
-      initialProps: { breakpoint: 768 },
-    })
+    const { rerender } = renderHook(
+      ({ breakpoint }) => useIsMobile(breakpoint),
+      {
+        initialProps: { breakpoint: 768 },
+      },
+    )
 
     expect(window.matchMedia).toHaveBeenCalledWith('(max-width: 768px)')
 

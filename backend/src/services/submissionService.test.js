@@ -97,7 +97,10 @@ describe('createSubmission', () => {
       .mockResolvedValueOnce('/submissions/first.jpg')
       .mockRejectedValueOnce(new Error('network error'))
 
-    const files = [makeFile({ originalname: 'first.jpg' }), makeFile({ originalname: 'second.jpg' })]
+    const files = [
+      makeFile({ originalname: 'first.jpg' }),
+      makeFile({ originalname: 'second.jpg' }),
+    ]
 
     await expect(
       createSubmission(validData, files, '127.0.0.1'),
