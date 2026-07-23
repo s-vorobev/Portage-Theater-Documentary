@@ -11,14 +11,14 @@ export const app = express()
 app.set('trust proxy', true)
 
 app.use(cors({ origin: env.FRONTEND_URL }))
-app.use('/api', submissionRoutes)
 app.use(express.json())
+app.use('/api', submissionRoutes)
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' })
 })
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   console.error(err)
 
   if (err instanceof multer.MulterError) {
@@ -37,7 +37,6 @@ app.use((err, req, res, next) => {
 
   const status = err.status || 500
   res.status(status).json({
-    error:
-      status === 500 ? 'Something went wrong. Please try again.' : err.message,
+    error: status === 500 ? 'Something went wrong. Please try again.' : err.message,
   })
 })
