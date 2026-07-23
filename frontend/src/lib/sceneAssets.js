@@ -1,6 +1,6 @@
 export const BACKGROUNDS = {
   theater: { src: '/theater_desktop.png', width: 3914, height: 1957 },
-  // theater_mobile.png
+  theaterMobile: { src: '/theater_mobile.png', width: 2276, height: 4553, },
 }
 
 export const ASSETS = {
