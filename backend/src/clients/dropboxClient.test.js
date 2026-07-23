@@ -10,10 +10,6 @@ vi.mock('dropbox', () => ({
   })),
 }))
 
-// config/env.js validates real process.env values and calls
-// process.exit(1) on failure — definitely not something a unit test
-// should trigger. Mocking it out entirely sidesteps that, and lets this
-// test run without any real Dropbox credentials present.
 vi.mock('../config/env.js', () => ({
   env: {
     DROPBOX_APP_KEY: 'test-key',

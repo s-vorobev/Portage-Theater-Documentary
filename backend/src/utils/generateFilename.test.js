@@ -14,8 +14,6 @@ describe('generateFilename', () => {
 
   it('produces a different name for a file with no extension', () => {
     const result = generateFilename('noextension')
-    // extname() returns '' for a file with no dot, so the result should
-    // just be the UUID with nothing appended after it.
     expect(result.includes('.')).toBe(false)
   })
 
