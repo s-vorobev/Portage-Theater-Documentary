@@ -49,12 +49,12 @@ function Form({ isOpen, onClose }) {
 
   const wordCount = countWords(message)
 
+  // Required fields only — phone and media stay optional. This drives
+  // the submit button's disabled state directly, so users can't submit
+  // an incomplete form in the first place rather than finding out after
+  // clicking submit.
   const isFormValid =
-    firstName.trim() &&
-    lastName.trim() &&
-    email.trim() &&
-    message.trim() &&
-    !fileError
+    firstName.trim() && lastName.trim() && email.trim() && message.trim() && !fileError
 
   function handleMessageChange(e) {
     const value = e.target.value
@@ -131,18 +131,14 @@ function Form({ isOpen, onClose }) {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setFormError(
-          data.error ||
-            'Something went wrong submitting your form. Please try again.',
-        )
+        setFormError(data.error || 'Something went wrong submitting your form. Please try again.')
         return
       }
 
       setIsSuccess(true)
     } catch (err) {
-      setFormError(
-        'Something went wrong submitting your form. Please try again.',
-      )
+      setFormError('Something went wrong submitting your form. Please try again.')
+      console.log(err)
     } finally {
       setIsSubmitting(false)
     }
