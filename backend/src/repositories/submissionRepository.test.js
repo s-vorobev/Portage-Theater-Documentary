@@ -43,8 +43,6 @@ const files = [
 describe('insertSubmissionWithFiles', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Default happy-path behavior — individual tests override specific
-    // calls as needed via mockResolvedValueOnce / mockRejectedValueOnce.
     mockClient.query.mockImplementation((sql) => {
       if (sql.includes('RETURNING submission_id')) {
         return Promise.resolve({ rows: [{ submission_id: 'sub-id-1' }] })

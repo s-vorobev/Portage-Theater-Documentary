@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// vi.mock calls are hoisted above imports by Vitest automatically, so
-// these replace the real modules before submissionService.js ever
-// imports them — meaning no real Dropbox or DB calls happen in this
-// file at all.
 vi.mock('../clients/dropboxClient.js', () => ({
   uploadFile: vi.fn(),
   deleteFile: vi.fn(),

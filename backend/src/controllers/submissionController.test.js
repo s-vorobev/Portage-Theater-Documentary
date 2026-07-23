@@ -71,10 +71,6 @@ describe('submitForm', () => {
     const req = { body: validBody, files: [], ip: '127.0.0.1' }
     const res = makeRes()
 
-    // The controller intentionally does NOT catch this — express-async-errors
-    // is what forwards it to app.js's global handler in the real app, so
-    // here we just confirm the controller lets it propagate rather than
-    // swallowing it or crafting its own response.
     await expect(submitForm(req, res)).rejects.toThrow('upload failed')
   })
 })
