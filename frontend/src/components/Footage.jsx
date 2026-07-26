@@ -13,8 +13,8 @@ function Footage() {
 
   useEffect(() => {
     if (document.readyState === 'complete') {
-      setShouldLoad(true)
-      return
+      const id = setTimeout(() => setShouldLoad(true), 0)
+      return () => clearTimeout(id)
     }
 
     const onLoad = () => setShouldLoad(true)
