@@ -18,7 +18,7 @@ async function redirectToPresignedUrl(res, key) {
         Bucket: process.env.BUCKET_NAME,
         Key: key,
       }),
-      { expiresIn: 3600 }
+      { expiresIn: 3600 },
     )
     res.redirect(url)
   } catch (err) {

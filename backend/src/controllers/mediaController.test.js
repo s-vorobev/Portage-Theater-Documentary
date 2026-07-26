@@ -47,7 +47,8 @@ describe('mediaController', () => {
 
   describe('getFootage', () => {
     it('redirects to the presigned URL for footage.mp4', async () => {
-      const fakeUrl = 'https://storage.railway.app/test-bucket/footage.mp4?signature=abc'
+      const fakeUrl =
+        'https://storage.railway.app/test-bucket/footage.mp4?signature=abc'
       mockGetSignedUrl.mockResolvedValueOnce(fakeUrl)
 
       const req = {}
@@ -81,7 +82,8 @@ describe('mediaController', () => {
 
   describe('getFootageMobile', () => {
     it('redirects to the presigned URL for footage_mobile.mov', async () => {
-      const fakeUrl = 'https://storage.railway.app/test-bucket/footage_mobile.mov?signature=xyz'
+      const fakeUrl =
+        'https://storage.railway.app/test-bucket/footage_mobile.mov?signature=xyz'
       mockGetSignedUrl.mockResolvedValueOnce(fakeUrl)
 
       const req = {}

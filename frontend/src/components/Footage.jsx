@@ -24,8 +24,7 @@ function Footage() {
 
   useEffect(() => {
     if (shouldLoad && videoRef.current) {
-      videoRef.current.play().catch(() => {
-      })
+      videoRef.current.play().catch(() => {})
     }
   }, [shouldLoad])
 
