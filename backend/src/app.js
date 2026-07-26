@@ -5,6 +5,7 @@ import cors from 'cors'
 import multer from 'multer'
 import { env } from './config/env.js'
 import submissionRoutes from './routes/submissionRoutes.js'
+import mediaRoutes from './routes/mediaRoutes.js'
 
 export const app = express()
 
@@ -13,6 +14,7 @@ app.set('trust proxy', true)
 app.use(cors({ origin: env.FRONTEND_URL }))
 app.use(express.json())
 app.use('/api', submissionRoutes)
+app.use(mediaRoutes)
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' })
