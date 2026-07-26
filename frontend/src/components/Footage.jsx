@@ -1,20 +1,48 @@
+import { useEffect, useRef, useState } from 'react'
 import './Footage.css'
+import { useIsMobile } from '../lib/useIsMobile'
 
 function Footage() {
+  const isMobile = useIsMobile()
+  const API_BASE = import.meta.env.VITE_API_URL
+  const videoSrc = isMobile
+    ? `${API_BASE}/media/footage-mobile`
+    : `${API_BASE}/media/footage`
+  const videoRef = useRef(null)
+  const [shouldLoad, setShouldLoad] = useState(false)
+
+  useEffect(() => {
+    if (document.readyState === 'complete') {
+      const id = setTimeout(() => setShouldLoad(true), 0)
+      return () => clearTimeout(id)
+    }
+
+    const onLoad = () => setShouldLoad(true)
+    window.addEventListener('load', onLoad)
+    return () => window.removeEventListener('load', onLoad)
+  }, [])
+
+  useEffect(() => {
+    if (shouldLoad && videoRef.current) {
+      videoRef.current.play().catch(() => {})
+    }
+  }, [shouldLoad])
+
   return (
     <section id="footage" className="page footage">
-      <div className="video-frame">
-        <iframe
-          width="100%"
-          height="100%"
-          src="https://www.youtube-nocookie.com/embed/_38eWYEJHD4?autoplay=1&mute=1&loop=1&playlist=_38eWYEJHD4&controls=0&rel=0&modestbranding=1&iv_load_policy=3"
-          title="Documentary footage"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-        <div className="video-overlay" />
-      </div>
+      <video
+        ref={videoRef}
+        key={videoSrc}
+        className="footage-video"
+        src={shouldLoad ? videoSrc : undefined}
+        preload="none"
+        fetchPriority="low"
+        autoPlay
+        muted
+        loop
+        playsInline
+        controls={false}
+      />
     </section>
   )
 }
