@@ -12,6 +12,7 @@ const validBody = {
   lastName: 'Vorobev',
   email: 'sergei@example.com',
   message: 'Test message',
+  recaptchaToken: 'valid-recaptcha-token',
 }
 
 function makeRes() {
@@ -43,7 +44,7 @@ describe('submitForm', () => {
     expect(createSubmission).not.toHaveBeenCalled()
   })
 
-  it('calls createSubmission with the validated data, files, and ip on success', async () => {
+  it('calls createSubmission with the validated data, files, ip, and recaptcha token on success', async () => {
     createSubmission.mockResolvedValue('new-id-123')
     const files = [{ originalname: 'a.jpg' }]
     const req = { body: validBody, files, ip: '203.0.113.5' }
@@ -58,7 +59,19 @@ describe('submitForm', () => {
       }),
       files,
       '203.0.113.5',
+      'valid-recaptcha-token',
     )
+  })
+
+  it('does not leak recaptchaToken into the data passed for contract validation', async () => {
+    createSubmission.mockResolvedValue('new-id-123')
+    const req = { body: validBody, files: [], ip: '127.0.0.1' }
+    const res = makeRes()
+
+    await submitForm(req, res)
+
+    const [dataArg] = createSubmission.mock.calls[0]
+    expect(dataArg.recaptchaToken).toBeUndefined()
   })
 
   it('returns 201 with the new submission id on success', async () => {
