@@ -27,6 +27,7 @@ React front end application for the Portage Theater Documentary website. Built w
 - **Vite** — build tool and dev server with HMR
 - **ESLint** — code quality checks enforced on every PR
 - **Vitest** — unit testing
+- **reCAPTCHA v3** — invisible bot protection on the submission form
 
 ### Getting Started
 
@@ -42,11 +43,15 @@ Create `frontend/.env` (see `frontend/.env.example`):
 
 ```
 VITE_API_URL=http://localhost:3001
+VITE_RECAPTCHA_SITE_KEY=
 ```
 
-| Variable       | Required                                 | Description                                                                                                                                                   |
-| -------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `VITE_API_URL` | No — defaults to `http://localhost:3001` | Base URL of the backend API. Must be prefixed with `VITE_` for Vite to expose it to the browser bundle. Update this per environment (dev/prod) when deployed. |
+| Variable                  | Required                                 | Description                                                                                                                                                   |
+| -------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_URL`             | No — defaults to `http://localhost:3001` | Base URL of the backend API. Must be prefixed with `VITE_` for Vite to expose it to the browser bundle. Update this per environment (dev/prod) when deployed. |
+| `VITE_RECAPTCHA_SITE_KEY`  | **Yes**                                  | Public reCAPTCHA v3 site key from the [reCAPTCHA admin console](https://www.google.com/recaptcha/admin). The domain the app runs on (including `localhost` for local dev) must be added to that key's allowed domains list, or verification will fail. |
+
+reCAPTCHA v3 runs invisibly — there's no checkbox widget. A token is generated fresh at submit time and sent to the backend, which verifies it with Google and decides whether to accept the submission based on the returned score.
 
 ### Scripts
 
@@ -61,7 +66,7 @@ VITE_API_URL=http://localhost:3001
 
 ## Backend
 
-Express API handling community form submissions — validates incoming data, uploads media to Dropbox, and stores submission records in Postgres. Also serves video assets from Railway bucket storage via presigned URLs.
+Express API handling community form submissions — validates incoming data, verifies reCAPTCHA and rate limits, uploads media to Dropbox, and stores submission records in Postgres. Also serves video assets from Railway bucket storage via presigned URLs.
 
 ### Tech Stack
 
@@ -71,6 +76,7 @@ Express API handling community form submissions — validates incoming data, upl
 - **Multer** — multipart/form-data + file upload handling
 - **Dropbox SDK** — media storage
 - **AWS SDK (S3-compatible)** — bucket storage for video assets
+- **reCAPTCHA v3** — server-side token verification against Google
 
 ### Getting Started
 
@@ -99,6 +105,8 @@ DROPBOX_UPLOAD_FOLDER=/submissions-dev
 
 FRONTEND_URL=http://localhost:5173
 
+RECAPTCHA_SECRET_KEY=
+
 BUCKET_ENDPOINT=
 BUCKET_REGION=auto
 BUCKET_ACCESS_KEY=
@@ -106,23 +114,33 @@ BUCKET_SECRET_KEY=
 BUCKET_NAME=
 ```
 
-| Variable                 | Required                                 | Description                                                                                                                                                                                                          |
-| ------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PORT`                   | No — defaults to `3001`                  | Port the Express server listens on.                                                                                                                                                                                  |
-| `NODE_ENV`               | No — defaults to `development`           | `development`, `production`, or `test`.                                                                                                                                                                              |
-| `DATABASE_URL`           | **Yes**                                  | Postgres connection string. Locally, use Railway's `DATABASE_PUBLIC_URL` value for the dev database — the plain `DATABASE_URL` Railway shows is only reachable from inside Railway's network, not from your machine. |
-| `DROPBOX_APP_KEY`        | **Yes**                                  | From the Dropbox App Console, under your app's Settings tab.                                                                                                                                                         |
-| `DROPBOX_APP_SECRET`     | **Yes**                                  | Same location — click "Show" to reveal it.                                                                                                                                                                           |
-| `DROPBOX_REFRESH_TOKEN`  | **Yes**                                  | Obtained via a one-time OAuth authorization flow. Does not expire under normal use. See team docs for the exact steps if you need to generate a new one.                                                             |
-| `DROPBOX_UPLOAD_FOLDER`  | No — defaults to `/submissions`          | Folder path in Dropbox where uploaded media is stored.                                                                                                                                                               |
-| `FRONTEND_URL`           | No — defaults to `http://localhost:5173` | Used for CORS — must match wherever the frontend is actually running, or browser requests to the API will be blocked.                                                                                                |
-| `BUCKET_ENDPOINT`        | **Yes**                                  | S3-compatible endpoint URL for the Railway bucket. Use the value as given in Railway's bucket credentials — it already includes the `https://` scheme, don't prepend it again.                                       |
-| `BUCKET_REGION`          | No — defaults to `auto`                  | Region for the S3 client. Railway buckets use `auto`.                                                                                                                                                                |
-| `BUCKET_ACCESS_KEY`      | **Yes**                                  | From the Railway bucket's Credentials tab. Pass into this service via a Variable Reference rather than copy-pasting, so it stays in sync if rotated.                                                                 |
-| `BUCKET_SECRET_KEY`      | **Yes**                                  | Same location as above — pass via Variable Reference.                                                                                                                                                                |
-| `BUCKET_NAME`            | **Yes**                                  | The bucket's name as shown in Railway (display name + hash suffix).                                                                                                                                                   |
+| Variable                | Required                                 | Description                                                                                                                                                                                                          |
+| ------------------------ | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PORT`                  | No — defaults to `3001`                  | Port the Express server listens on.                                                                                                                                                                                  |
+| `NODE_ENV`              | No — defaults to `development`           | `development`, `production`, or `test`.                                                                                                                                                                              |
+| `DATABASE_URL`          | **Yes**                                  | Postgres connection string. Locally, use Railway's `DATABASE_PUBLIC_URL` value for the dev database — the plain `DATABASE_URL` Railway shows is only reachable from inside Railway's network, not from your machine. |
+| `DROPBOX_APP_KEY`       | **Yes**                                  | From the Dropbox App Console, under your app's Settings tab.                                                                                                                                                         |
+| `DROPBOX_APP_SECRET`    | **Yes**                                  | Same location — click "Show" to reveal it.                                                                                                                                                                           |
+| `DROPBOX_REFRESH_TOKEN` | **Yes**                                  | Obtained via a one-time OAuth authorization flow. Does not expire under normal use. See team docs for the exact steps if you need to generate a new one.                                                             |
+| `DROPBOX_UPLOAD_FOLDER` | No — defaults to `/submissions`          | Folder path in Dropbox where uploaded media is stored.                                                                                                                                                               |
+| `FRONTEND_URL`          | No — defaults to `http://localhost:5173` | Used for CORS — must match wherever the frontend is actually running, or browser requests to the API will be blocked.                                                                                                |
+| `RECAPTCHA_SECRET_KEY`  | **Yes**                                  | Private reCAPTCHA v3 secret key from the [reCAPTCHA admin console](https://www.google.com/recaptcha/admin) (pairs with the frontend's `VITE_RECAPTCHA_SITE_KEY`). Never exposed to the browser — used server-side only to verify tokens with Google. |
+| `BUCKET_ENDPOINT`       | **Yes**                                  | S3-compatible endpoint URL for the Railway bucket. Use the value as given in Railway's bucket credentials — it already includes the `https://` scheme, don't prepend it again.                                       |
+| `BUCKET_REGION`         | No — defaults to `auto`                  | Region for the S3 client. Railway buckets use `auto`.                                                                                                                                                                |
+| `BUCKET_ACCESS_KEY`     | **Yes**                                  | From the Railway bucket's Credentials tab. Pass into this service via a Variable Reference rather than copy-pasting, so it stays in sync if rotated.                                                                 |
+| `BUCKET_SECRET_KEY`     | **Yes**                                  | Same location as above — pass via Variable Reference.                                                                                                                                                                 |
+| `BUCKET_NAME`           | **Yes**                                  | The bucket's name as shown in Railway (display name + hash suffix).                                                                                                                                                   |
 
 Run `sql/schema.sql` once against a fresh Postgres database before the API can store anything — it's not run automatically. Easiest via Railway's Postgres service → Data/query console → paste and execute the file's contents.
+
+### Submission protections
+
+The `/api/submit` endpoint is protected by two independent checks, both enforced server-side regardless of what the frontend sends:
+
+- **reCAPTCHA v3** — every submission must include a valid token, generated fresh at submit time. The backend verifies it against Google (`recaptchaService.js`) and rejects the request if verification fails, the score falls below threshold, or the action name doesn't match.
+- **IP-based rate limiting** — each IP is limited to **2 submissions per 7 days** (`rateLimitService.js` / `rateLimitRepository.js`). Once the limit is hit, the API responds with a `429` and a message pointing the person to email their submission to `footage@portagetheaterdocumentary.com` instead.
+
+Both checks run before any file upload or database write, so a rejected request never touches Dropbox or Postgres.
 
 ### Scripts
 
