@@ -11,4 +11,5 @@ function load(filename) {
 export const queries = {
   insertSubmission: load('insertSubmission.sql'),
   insertSubmissionFile: load('insertSubmissionFile.sql'),
+  countRecentSubmissionsByIp: load('countRecentSubmissionsByIp.sql'),
 }

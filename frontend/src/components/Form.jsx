@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './Form.css'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 
 const MAX_MESSAGE_WORDS = 100
 const MAX_FILES = 10
@@ -35,6 +36,7 @@ function formatBytes(bytes) {
 }
 
 function Form({ isOpen, onClose }) {
+  const { executeRecaptcha } = useGoogleReCaptcha()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -45,14 +47,16 @@ function Form({ isOpen, onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
+  useEffect(() => {
+    if (!isOpen) return
+    document.body.classList.add('form-open')
+    return () => document.body.classList.remove('form-open')
+  }, [isOpen])
+
   if (!isOpen) return null
 
   const wordCount = countWords(message)
 
-  // Required fields only — phone and media stay optional. This drives
-  // the submit button's disabled state directly, so users can't submit
-  // an incomplete form in the first place rather than finding out after
-  // clicking submit.
   const isFormValid =
     firstName.trim() &&
     lastName.trim() &&
@@ -117,15 +121,23 @@ function Form({ isOpen, onClose }) {
       return
     }
 
+    if (!executeRecaptcha) {
+      setFormError('Something went wrong. Please refresh and try again.')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
+      const recaptchaToken = await executeRecaptcha('submit_form')
+
       const formData = new FormData()
       formData.set('firstName', firstName.trim())
       formData.set('lastName', lastName.trim())
       formData.set('email', email.trim())
       formData.set('phone', e.target.phone.value.trim())
       formData.set('message', message.trim())
+      formData.set('recaptchaToken', recaptchaToken)
       files.forEach((file) => formData.append('media', file))
 
       const response = await fetch(`${API_URL}/api/submit`, {
@@ -278,6 +290,26 @@ function Form({ isOpen, onClose }) {
                   </ul>
                 )}
               </div>
+
+              <p className="recaptcha-disclosure">
+                This site is protected by reCAPTCHA and the Google{' '}
+                <a
+                  href="https://policies.google.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Privacy Policy
+                </a>{' '}
+                and{' '}
+                <a
+                  href="https://policies.google.com/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Terms of Service
+                </a>{' '}
+                apply.
+              </p>
 
               <button
                 type="submit"

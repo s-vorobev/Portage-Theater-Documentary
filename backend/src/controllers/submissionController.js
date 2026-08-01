@@ -2,7 +2,8 @@ import { submissionContract } from '../contracts/submissionContract.js'
 import { createSubmission } from '../services/submissionService.js'
 
 export async function submitForm(req, res) {
-  const result = submissionContract.safeParse(req.body)
+  const { recaptchaToken, ...formFields } = req.body
+  const result = submissionContract.safeParse(formFields)
 
   if (!result.success) {
     return res.status(400).json({
@@ -10,7 +11,12 @@ export async function submitForm(req, res) {
     })
   }
 
-  const submissionId = await createSubmission(result.data, req.files, req.ip)
+  const submissionId = await createSubmission(
+    result.data,
+    req.files,
+    req.ip,
+    recaptchaToken,
+  )
 
   res.status(201).json({ id: submissionId })
 }

@@ -6,10 +6,11 @@ const envSchema = z.object({
 
   DATABASE_URL: z.string().url(),
 
+  RECAPTCHA_SECRET_KEY: z.string().min(1),
   DROPBOX_APP_KEY: z.string().min(1),
   DROPBOX_APP_SECRET: z.string().min(1),
   DROPBOX_REFRESH_TOKEN: z.string().min(1),
-  DROPBOX_UPLOAD_FOLDER: z.string().min(1).default('/submissions-dev'),
+  DROPBOX_UPLOAD_FOLDER: z.string().min(1).default('/dev'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
 
   NODE_ENV: z
