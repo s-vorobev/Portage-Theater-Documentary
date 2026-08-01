@@ -202,6 +202,27 @@ input[type='file'] {
   color: #fff;
 }
 
+.recaptcha-disclosure {
+  font-size: 0.68rem;
+  opacity: 0.75;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.recaptcha-disclosure a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
+body.form-open .grecaptcha-badge {
+  visibility: visible !important;
+  z-index: 2147483647 !important;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
