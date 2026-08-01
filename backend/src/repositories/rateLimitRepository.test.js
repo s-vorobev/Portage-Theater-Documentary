@@ -8,7 +8,8 @@ vi.mock('../db/pool.js', () => ({
 
 vi.mock('../db/sql/loader.js', () => ({
   queries: {
-    countRecentSubmissionsByIp: 'SELECT COUNT(*) AS submission_count FROM submissions WHERE ip_address = $1 AND created_at > $2',
+    countRecentSubmissionsByIp:
+      'SELECT COUNT(*) AS submission_count FROM submissions WHERE ip_address = $1 AND created_at > $2',
   },
 }))
 
@@ -25,10 +26,10 @@ describe('countRecentSubmissionsByIp', () => {
     const since = new Date('2026-01-01T00:00:00Z')
     const result = await countRecentSubmissionsByIp('1.2.3.4', since)
 
-    expect(mockQuery).toHaveBeenCalledWith(
-      expect.any(String),
-      ['1.2.3.4', since],
-    )
+    expect(mockQuery).toHaveBeenCalledWith(expect.any(String), [
+      '1.2.3.4',
+      since,
+    ])
     expect(result).toBe(3)
     expect(typeof result).toBe('number')
   })

@@ -47,7 +47,7 @@ export async function createSubmission(
       'Total attachments must be under 3GB. Please remove some files.',
     )
   }
-  
+
   const withinLimit = await isWithinRateLimit(ipAddress)
   if (!withinLimit) {
     throw new HttpError(429, RATE_LIMIT_MESSAGE)

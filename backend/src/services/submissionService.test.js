@@ -129,12 +129,7 @@ describe('createSubmission', () => {
     uploadFile.mockResolvedValue('/submissions/x.jpg')
     insertSubmissionWithFiles.mockResolvedValue('id-123')
 
-    await createSubmission(
-      validData,
-      [makeFile()],
-      '10.0.0.1',
-      VALID_TOKEN,
-    )
+    await createSubmission(validData, [makeFile()], '10.0.0.1', VALID_TOKEN)
 
     const [submissionArg] = insertSubmissionWithFiles.mock.calls[0]
     expect(submissionArg.firstName).toBe('Sergei')

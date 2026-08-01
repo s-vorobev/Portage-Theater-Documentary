@@ -5,7 +5,9 @@ import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}>
+  <GoogleReCaptchaProvider
+    reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+  >
     <StrictMode>
       <App />
     </StrictMode>

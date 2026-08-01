@@ -4,14 +4,17 @@ const RECAPTCHA_SCORE_THRESHOLD = 0.5
 const EXPECTED_ACTION = 'submit_form'
 
 export async function verifyRecaptcha(token) {
-  const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      secret: env.RECAPTCHA_SECRET_KEY,
-      response: token,
-    }),
-  })
+  const response = await fetch(
+    'https://www.google.com/recaptcha/api/siteverify',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        secret: env.RECAPTCHA_SECRET_KEY,
+        response: token,
+      }),
+    },
+  )
 
   const data = await response.json()
   if (!data.success) {
