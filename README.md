@@ -45,7 +45,7 @@ VITE_API_URL=http://localhost:3001
 ```
 
 | Variable       | Required                                 | Description                                                                                                                                                   |
-| -------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| -------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `VITE_API_URL` | No — defaults to `http://localhost:3001` | Base URL of the backend API. Must be prefixed with `VITE_` for Vite to expose it to the browser bundle. Update this per environment (dev/prod) when deployed. |
 
 ### Scripts
@@ -61,7 +61,7 @@ VITE_API_URL=http://localhost:3001
 
 ## Backend
 
-Express API handling community form submissions — validates incoming data, uploads media to Dropbox, and stores submission records in Postgres.
+Express API handling community form submissions — validates incoming data, uploads media to Dropbox, and stores submission records in Postgres. Also serves video assets from Railway bucket storage via presigned URLs.
 
 ### Tech Stack
 
@@ -70,6 +70,7 @@ Express API handling community form submissions — validates incoming data, upl
 - **Zod** — request validation
 - **Multer** — multipart/form-data + file upload handling
 - **Dropbox SDK** — media storage
+- **AWS SDK (S3-compatible)** — bucket storage for video assets
 
 ### Getting Started
 
@@ -97,18 +98,29 @@ DROPBOX_REFRESH_TOKEN=
 DROPBOX_UPLOAD_FOLDER=/submissions-dev
 
 FRONTEND_URL=http://localhost:5173
+
+BUCKET_ENDPOINT=
+BUCKET_REGION=auto
+BUCKET_ACCESS_KEY=
+BUCKET_SECRET_KEY=
+BUCKET_NAME=
 ```
 
-| Variable                | Required                                 | Description                                                                                                                                                                                                          |
-| ----------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PORT`                  | No — defaults to `3001`                  | Port the Express server listens on.                                                                                                                                                                                  |
-| `NODE_ENV`              | No — defaults to `development`           | `development`, `production`, or `test`.                                                                                                                                                                              |
-| `DATABASE_URL`          | **Yes**                                  | Postgres connection string. Locally, use Railway's `DATABASE_PUBLIC_URL` value for the dev database — the plain `DATABASE_URL` Railway shows is only reachable from inside Railway's network, not from your machine. |
-| `DROPBOX_APP_KEY`       | **Yes**                                  | From the Dropbox App Console, under your app's Settings tab.                                                                                                                                                         |
-| `DROPBOX_APP_SECRET`    | **Yes**                                  | Same location — click "Show" to reveal it.                                                                                                                                                                           |
-| `DROPBOX_REFRESH_TOKEN` | **Yes**                                  | Obtained via a one-time OAuth authorization flow. Does not expire under normal use. See team docs for the exact steps if you need to generate a new one.                                                             |
-| `DROPBOX_UPLOAD_FOLDER` | No — defaults to `/submissions`          | Folder path in Dropbox where uploaded media is stored.                                                                                                                                                               |
-| `FRONTEND_URL`          | No — defaults to `http://localhost:5173` | Used for CORS — must match wherever the frontend is actually running, or browser requests to the API will be blocked.                                                                                                |
+| Variable                 | Required                                 | Description                                                                                                                                                                                                          |
+| ------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PORT`                   | No — defaults to `3001`                  | Port the Express server listens on.                                                                                                                                                                                  |
+| `NODE_ENV`               | No — defaults to `development`           | `development`, `production`, or `test`.                                                                                                                                                                              |
+| `DATABASE_URL`           | **Yes**                                  | Postgres connection string. Locally, use Railway's `DATABASE_PUBLIC_URL` value for the dev database — the plain `DATABASE_URL` Railway shows is only reachable from inside Railway's network, not from your machine. |
+| `DROPBOX_APP_KEY`        | **Yes**                                  | From the Dropbox App Console, under your app's Settings tab.                                                                                                                                                         |
+| `DROPBOX_APP_SECRET`     | **Yes**                                  | Same location — click "Show" to reveal it.                                                                                                                                                                           |
+| `DROPBOX_REFRESH_TOKEN`  | **Yes**                                  | Obtained via a one-time OAuth authorization flow. Does not expire under normal use. See team docs for the exact steps if you need to generate a new one.                                                             |
+| `DROPBOX_UPLOAD_FOLDER`  | No — defaults to `/submissions`          | Folder path in Dropbox where uploaded media is stored.                                                                                                                                                               |
+| `FRONTEND_URL`           | No — defaults to `http://localhost:5173` | Used for CORS — must match wherever the frontend is actually running, or browser requests to the API will be blocked.                                                                                                |
+| `BUCKET_ENDPOINT`        | **Yes**                                  | S3-compatible endpoint URL for the Railway bucket. Use the value as given in Railway's bucket credentials — it already includes the `https://` scheme, don't prepend it again.                                       |
+| `BUCKET_REGION`          | No — defaults to `auto`                  | Region for the S3 client. Railway buckets use `auto`.                                                                                                                                                                |
+| `BUCKET_ACCESS_KEY`      | **Yes**                                  | From the Railway bucket's Credentials tab. Pass into this service via a Variable Reference rather than copy-pasting, so it stays in sync if rotated.                                                                 |
+| `BUCKET_SECRET_KEY`      | **Yes**                                  | Same location as above — pass via Variable Reference.                                                                                                                                                                |
+| `BUCKET_NAME`            | **Yes**                                  | The bucket's name as shown in Railway (display name + hash suffix).                                                                                                                                                   |
 
 Run `sql/schema.sql` once against a fresh Postgres database before the API can store anything — it's not run automatically. Easiest via Railway's Postgres service → Data/query console → paste and execute the file's contents.
 
