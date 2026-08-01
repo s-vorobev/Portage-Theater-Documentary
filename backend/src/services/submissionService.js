@@ -1,6 +1,7 @@
 import { generateFilename } from '../utils/generateFilename.js'
 import { HttpError } from '../utils/HttpError.js'
 import { verifyRecaptcha } from './recaptchaService.js'
+import { isWithinRateLimit } from './rateLimitService.js'
 import { Submission } from '../models/Submission.js'
 import { SubmissionFile } from '../models/SubmissionFile.js'
 import { insertSubmissionWithFiles } from '../repositories/submissionRepository.js'
@@ -19,6 +20,9 @@ const ACCEPTED_TYPES = [
   'audio/mpeg',
   'application/pdf',
 ]
+
+const RATE_LIMIT_MESSAGE =
+  'Too many submissions from this connection. You can email your submission to footage@portagetheaterdocumentary.com instead.'
 
 export async function createSubmission(
   data,
@@ -42,6 +46,11 @@ export async function createSubmission(
       400,
       'Total attachments must be under 3GB. Please remove some files.',
     )
+  }
+  
+  const withinLimit = await isWithinRateLimit(ipAddress)
+  if (!withinLimit) {
+    throw new HttpError(429, RATE_LIMIT_MESSAGE)
   }
 
   if (!recaptchaToken) {
