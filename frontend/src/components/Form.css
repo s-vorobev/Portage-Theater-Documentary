@@ -219,7 +219,8 @@ input[type='file'] {
 }
 
 body.form-open .grecaptcha-badge {
-  visibility: visible;
+  visibility: visible !important;
+  z-index: 2147483647 !important;
 }
 
 @keyframes fadeIn {
