@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './Footage.css'
-import { useIsMobile } from '../lib/useIsMobile'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 function Footage() {
   const isMobile = useIsMobile()

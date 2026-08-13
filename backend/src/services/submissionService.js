@@ -6,23 +6,17 @@ import { Submission } from '../models/Submission.js'
 import { SubmissionFile } from '../models/SubmissionFile.js'
 import { insertSubmissionWithFiles } from '../repositories/submissionRepository.js'
 import { uploadFile, deleteFile } from '../clients/dropboxClient.js'
+import {
+  ACCEPTED_FILE_TYPES,
+  FALLBACK_EMAIL,
+  UPLOAD_LIMITS,
+} from '../config/constants.js'
 
-const MAX_TOTAL_SIZE_BYTES = 3 * 1024 * 1024 * 1024 // 3GB
-const ACCEPTED_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-  'image/tiff',
-  'video/mp4',
-  'video/quicktime',
-  'video/webm',
-  'audio/mpeg',
-  'application/pdf',
-]
+const RATE_LIMIT_MESSAGE = `Too many submissions from this connection. You can email your submission to ${FALLBACK_EMAIL} instead.`
 
-const RATE_LIMIT_MESSAGE =
-  'Too many submissions from this connection. You can email your submission to footage@portagetheaterdocumentary.com instead.'
+async function rollbackUploads(paths) {
+  await Promise.allSettled(paths.map((path) => deleteFile(path)))
+}
 
 export async function createSubmission(
   data,
@@ -31,7 +25,7 @@ export async function createSubmission(
   recaptchaToken,
 ) {
   const invalidType = uploadedFiles.filter(
-    (f) => !ACCEPTED_TYPES.includes(f.mimetype),
+    (f) => !ACCEPTED_FILE_TYPES.includes(f.mimetype),
   )
   if (invalidType.length > 0) {
     throw new HttpError(
@@ -41,7 +35,7 @@ export async function createSubmission(
   }
 
   const totalBytes = uploadedFiles.reduce((sum, f) => sum + f.size, 0)
-  if (totalBytes > MAX_TOTAL_SIZE_BYTES) {
+  if (totalBytes > UPLOAD_LIMITS.maxTotalSizeBytes) {
     throw new HttpError(
       400,
       'Total attachments must be under 3GB. Please remove some files.',
@@ -87,7 +81,7 @@ export async function createSubmission(
       'Dropbox upload failed, rolling back already-uploaded files:',
       err,
     )
-    await Promise.allSettled(uploadedPaths.map((path) => deleteFile(path)))
+    await rollbackUploads(uploadedPaths)
     throw new HttpError(
       502,
       'Failed to upload one or more files. Please try again.',
@@ -104,17 +98,13 @@ export async function createSubmission(
   })
 
   try {
-    const submissionId = await insertSubmissionWithFiles(
-      submission,
-      fileRecords,
-    )
-    return submissionId
+    return await insertSubmissionWithFiles(submission, fileRecords)
   } catch (err) {
     console.error(
       'DB insert failed after successful upload, rolling back Dropbox files:',
       err,
     )
-    await Promise.allSettled(uploadedPaths.map((path) => deleteFile(path)))
+    await rollbackUploads(uploadedPaths)
     throw new HttpError(
       500,
       'Failed to save your submission. Please try again.',

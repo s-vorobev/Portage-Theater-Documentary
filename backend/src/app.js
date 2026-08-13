@@ -4,6 +4,7 @@ import express from 'express'
 import cors from 'cors'
 import multer from 'multer'
 import { env } from './config/env.js'
+import { FALLBACK_EMAIL } from './config/constants.js'
 import submissionRoutes from './routes/submissionRoutes.js'
 import mediaRoutes from './routes/mediaRoutes.js'
 
@@ -16,6 +17,12 @@ app.use(express.json())
 app.use('/api', submissionRoutes)
 app.use(mediaRoutes)
 
+const MULTER_ERROR_MESSAGES = {
+  LIMIT_FILE_SIZE: `One of your files is too large. You can email your submission to ${FALLBACK_EMAIL} instead.`,
+  LIMIT_FILE_COUNT: `Too many files. You can email your submission to ${FALLBACK_EMAIL} instead.`,
+  LIMIT_UNEXPECTED_FILE: `Unexpected file submitted. You can email your submission to ${FALLBACK_EMAIL} instead.`,
+}
+
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' })
 })
@@ -24,16 +31,10 @@ app.use((err, req, res, _next) => {
   console.error(err)
 
   if (err instanceof multer.MulterError) {
-    const messages = {
-      LIMIT_FILE_SIZE:
-        'One of your files is too large. You can email your submission to footage@portagetheaterdocumentary.com instead.',
-      LIMIT_FILE_COUNT:
-        'Too many files. You can email your submission to footage@portagetheaterdocumentary.com instead.',
-      LIMIT_UNEXPECTED_FILE:
-        'Unexpected file submitted. You can email your submission to footage@portagetheaterdocumentary.com instead.',
-    }
     return res.status(400).json({
-      error: messages[err.code] || 'There was a problem with your file upload.',
+      error:
+        MULTER_ERROR_MESSAGES[err.code] ||
+        'There was a problem with your file upload.',
     })
   }
 

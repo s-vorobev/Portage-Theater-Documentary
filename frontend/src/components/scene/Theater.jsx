@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import TheaterScene from './scene/TheaterScene'
-import SceneAsset from './scene/SceneAsset'
-import Form from './Form'
-import { BACKGROUNDS, ASSETS } from '../lib/sceneAssets'
-import { useIsMobile } from '../lib/useIsMobile'
-import { useWindowWidth } from '../lib/useWindowWidth'
+import TheaterScene from './TheaterScene'
+import SceneAsset from './SceneAsset'
+import Form from '../Form'
+import { BACKGROUNDS, ASSETS } from '../../lib/sceneAssets'
+import { useIsMobile } from '../../hooks/useIsMobile'
+import { useWindowWidth } from '../../hooks/useWindowWidth'
 import './Theater.css'
 
 const POSITIONS = {

@@ -1,5 +1,5 @@
 import './App.css'
-import Theater from './components/Theater'
+import Theater from './components/scene/Theater'
 import Footage from './components/Footage'
 
 function App() {
