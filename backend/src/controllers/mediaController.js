@@ -1,25 +1,13 @@
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { getPresignedUrl } from '../clients/bucketClient.js'
 
-const s3 = new S3Client({
-  endpoint: process.env.BUCKET_ENDPOINT,
-  region: process.env.BUCKET_REGION || 'auto',
-  credentials: {
-    accessKeyId: process.env.BUCKET_ACCESS_KEY,
-    secretAccessKey: process.env.BUCKET_SECRET_KEY,
-  },
-})
+const MEDIA_KEYS = {
+  footage: 'footage.mp4',
+  footageMobile: 'footage_mobile.mov',
+}
 
-async function redirectToPresignedUrl(res, key) {
+async function redirectToMedia(res, key) {
   try {
-    const url = await getSignedUrl(
-      s3,
-      new GetObjectCommand({
-        Bucket: process.env.BUCKET_NAME,
-        Key: key,
-      }),
-      { expiresIn: 3600 },
-    )
+    const url = await getPresignedUrl(key)
     res.redirect(url)
   } catch (err) {
     console.error(`Bucket presign error for key "${key}":`, err)
@@ -27,10 +15,7 @@ async function redirectToPresignedUrl(res, key) {
   }
 }
 
-export const getFootage = (req, res) => {
-  redirectToPresignedUrl(res, 'footage.mp4')
-}
+export const getFootage = (_req, res) => redirectToMedia(res, MEDIA_KEYS.footage)
 
-export const getFootageMobile = (req, res) => {
-  redirectToPresignedUrl(res, 'footage_mobile.mov')
-}
+export const getFootageMobile = (_req, res) =>
+  redirectToMedia(res, MEDIA_KEYS.footageMobile)

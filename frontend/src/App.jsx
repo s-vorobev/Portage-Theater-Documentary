@@ -1,12 +1,12 @@
 import './App.css'
-import Theater from './components/Theater'
-import Footage from './components/Footage'
+import Exterior from './scenes/Exterior/Exterior'
+import Auditorium from './scenes/Auditorium/Auditorium'
 
 function App() {
   return (
     <div className="scroll-container">
-      <Theater />
-      <Footage />
+      <Exterior />
+      <Auditorium />
     </div>
   )
 }

@@ -13,6 +13,12 @@ const envSchema = z.object({
   DROPBOX_UPLOAD_FOLDER: z.string().min(1).default('/dev'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
 
+  BUCKET_ENDPOINT: z.string().min(1),
+  BUCKET_REGION: z.string().default('auto'),
+  BUCKET_ACCESS_KEY: z.string().min(1),
+  BUCKET_SECRET_KEY: z.string().min(1),
+  BUCKET_NAME: z.string().min(1),
+
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
