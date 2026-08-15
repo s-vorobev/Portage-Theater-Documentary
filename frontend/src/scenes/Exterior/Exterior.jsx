@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import TheaterScene from './TheaterScene'
 import SceneAsset from './SceneAsset'
-import Form from '../Form'
+import Form from './Form'
 import { BACKGROUNDS, ASSETS } from '../../lib/sceneAssets'
 import { useIsMobile } from '../../hooks/useIsMobile'
 import { useWindowWidth } from '../../hooks/useWindowWidth'
-import './Theater.css'
+import './Exterior.css'
 
 const POSITIONS = {
   desktop: {
@@ -27,16 +27,16 @@ function getMobileTitleTop(width) {
   return 8
 }
 
-function Theater() {
+function Exterior() {
   const isMobile = useIsMobile()
   const width = useWindowWidth()
-  const bg = isMobile ? BACKGROUNDS.theaterMobile : BACKGROUNDS.theater
+  const bg = isMobile ? BACKGROUNDS.exteriorMobile : BACKGROUNDS.exterior
   const pos = isMobile ? POSITIONS.mobile : POSITIONS.desktop
   const [isFormOpen, setIsFormOpen] = useState(false)
 
   return (
     <TheaterScene
-      className="theater"
+      className="exterior"
       bgSrc={bg.src}
       bgWidth={bg.width}
       bgHeight={bg.height}
@@ -104,7 +104,7 @@ function Theater() {
         scale={pos.viewOurProgress.scale}
         onClick={() =>
           document
-            .getElementById('footage')
+            .getElementById('auditorium')
             ?.scrollIntoView({ behavior: 'smooth' })
         }
         className="scene-button"
@@ -113,4 +113,4 @@ function Theater() {
   )
 }
 
-export default Theater
+export default Exterior

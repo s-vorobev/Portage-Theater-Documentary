@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import './Footage.css'
-import { useIsMobile } from '../hooks/useIsMobile'
+import './Auditorium.css'
+import { useIsMobile } from '../../hooks/useIsMobile'
 
-function Footage() {
+function Auditorium() {
   const isMobile = useIsMobile()
   const API_BASE = import.meta.env.VITE_API_URL
   const videoSrc = isMobile
@@ -29,11 +29,11 @@ function Footage() {
   }, [shouldLoad])
 
   return (
-    <section id="footage" className="page footage">
+    <section id="auditorium" className="page auditorium">
       <video
         ref={videoRef}
         key={videoSrc}
-        className="footage-video"
+        className="auditorium-video"
         src={shouldLoad ? videoSrc : undefined}
         preload="none"
         fetchPriority="low"
@@ -47,4 +47,4 @@ function Footage() {
   )
 }
 
-export default Footage
+export default Auditorium

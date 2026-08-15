@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import './Form.css'
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
-import { countWords, formatBytes } from '../lib/format'
+import { countWords, formatBytes } from '../../lib/format'
 import {
   MAX_MESSAGE_WORDS,
   MAX_FILES,
   MAX_FILE_SIZE_BYTES,
   selectFiles,
-} from '../lib/uploadRules'
+} from '../../lib/uploadRules'
 
 const API_URL = import.meta.env.VITE_API_URL
 

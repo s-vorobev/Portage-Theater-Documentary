@@ -1,10 +1,10 @@
-.footage {
+.auditorium {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.footage-video {
+.auditorium-video {
   width: auto;
   height: 90%;
   object-fit: cover;
