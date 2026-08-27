@@ -4,11 +4,6 @@
 
 .inside-theater-video {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
   object-fit: cover;
   pointer-events: none;
   z-index: 1;
@@ -49,6 +44,3 @@
 .inside-theater-back:hover {
   background: rgba(0, 0, 0, 0.65);
 }
-
-/* TODO(mobile): add responsive rules for the frame, footage, and back button
-   once a mobile frame image and cutout dimensions are available. */

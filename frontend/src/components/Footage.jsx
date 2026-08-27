@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
 
-function Footage({ className }) {
+function Footage({ className, style }) {
   const isMobile = useIsMobile()
   const API_BASE = import.meta.env.VITE_API_URL
   const videoSrc = isMobile
@@ -33,6 +33,7 @@ function Footage({ className }) {
       ref={videoRef}
       key={videoSrc}
       className={className}
+      style={style}
       src={shouldLoad ? videoSrc : undefined}
       preload="none"
       fetchPriority="low"
