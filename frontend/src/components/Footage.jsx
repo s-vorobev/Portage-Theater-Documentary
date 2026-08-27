@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import './Auditorium.css'
-import { useIsMobile } from '../../hooks/useIsMobile'
+import { useIsMobile } from '../hooks/useIsMobile'
 
-function Auditorium() {
+function Footage({ className }) {
   const isMobile = useIsMobile()
   const API_BASE = import.meta.env.VITE_API_URL
   const videoSrc = isMobile
     ? `${API_BASE}/media/footage-mobile`
     : `${API_BASE}/media/footage`
+
   const videoRef = useRef(null)
   const [shouldLoad, setShouldLoad] = useState(false)
 
@@ -29,22 +29,20 @@ function Auditorium() {
   }, [shouldLoad])
 
   return (
-    <section id="auditorium" className="page auditorium">
-      <video
-        ref={videoRef}
-        key={videoSrc}
-        className="auditorium-video"
-        src={shouldLoad ? videoSrc : undefined}
-        preload="none"
-        fetchPriority="low"
-        autoPlay
-        muted
-        loop
-        playsInline
-        controls={false}
-      />
-    </section>
+    <video
+      ref={videoRef}
+      key={videoSrc}
+      className={className}
+      src={shouldLoad ? videoSrc : undefined}
+      preload="none"
+      fetchPriority="low"
+      autoPlay
+      muted
+      loop
+      playsInline
+      controls={false}
+    />
   )
 }
 
-export default Auditorium
+export default Footage

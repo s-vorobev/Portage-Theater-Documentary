@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import TheaterScene from './TheaterScene'
 import SceneAsset from './SceneAsset'
 import Form from './Form'
@@ -28,6 +29,7 @@ function getMobileTitleTop(width) {
 }
 
 function Exterior() {
+  const navigate = useNavigate()
   const isMobile = useIsMobile()
   const width = useWindowWidth()
   const bg = isMobile ? BACKGROUNDS.exteriorMobile : BACKGROUNDS.exterior
@@ -102,11 +104,7 @@ function Exterior() {
         centerX={pos.viewOurProgress.centerX}
         centerY={pos.viewOurProgress.centerY}
         scale={pos.viewOurProgress.scale}
-        onClick={() =>
-          document
-            .getElementById('auditorium')
-            ?.scrollIntoView({ behavior: 'smooth' })
-        }
+        onClick={() => navigate('/inside-theater')}
         className="scene-button"
       />
     </TheaterScene>

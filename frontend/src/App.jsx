@@ -1,13 +1,14 @@
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Exterior from './scenes/Exterior/Exterior'
-import Auditorium from './scenes/Auditorium/Auditorium'
+import InsideTheater from './scenes/InsideTheater/InsideTheater'
 
 function App() {
   return (
-    <div className="scroll-container">
-      <Exterior />
-      <Auditorium />
-    </div>
+    <Routes>
+      <Route path="/" element={<Exterior />} />
+      <Route path="/inside-theater" element={<InsideTheater />} />
+    </Routes>
   )
 }
 
