@@ -15,7 +15,8 @@ async function redirectToMedia(res, key) {
   }
 }
 
-export const getFootage = (_req, res) => redirectToMedia(res, MEDIA_KEYS.footage)
+export const getFootage = (_req, res) =>
+  redirectToMedia(res, MEDIA_KEYS.footage)
 
 export const getFootageMobile = (_req, res) =>
   redirectToMedia(res, MEDIA_KEYS.footageMobile)

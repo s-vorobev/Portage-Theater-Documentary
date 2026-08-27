@@ -13,6 +13,10 @@ const upload = multer({
   },
 })
 
-router.post('/submit', upload.array('media', UPLOAD_LIMITS.maxFiles), submitForm)
+router.post(
+  '/submit',
+  upload.array('media', UPLOAD_LIMITS.maxFiles),
+  submitForm,
+)
 
 export default router

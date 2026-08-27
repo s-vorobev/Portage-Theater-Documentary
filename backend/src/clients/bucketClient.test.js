@@ -1,16 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const {
-  mockSend,
-  mockGetSignedUrl,
-  mockGetObjectCommand,
-  s3State,
-} = vi.hoisted(() => ({
-  mockSend: vi.fn(),
-  mockGetSignedUrl: vi.fn(),
-  mockGetObjectCommand: vi.fn(),
-  s3State: { config: null },
-}))
+const { mockSend, mockGetSignedUrl, mockGetObjectCommand, s3State } =
+  vi.hoisted(() => ({
+    mockSend: vi.fn(),
+    mockGetSignedUrl: vi.fn(),
+    mockGetObjectCommand: vi.fn(),
+    s3State: { config: null },
+  }))
 
 vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: vi.fn().mockImplementation(function (config) {
