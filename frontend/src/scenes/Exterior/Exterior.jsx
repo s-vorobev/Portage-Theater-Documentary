@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import TheaterScene from './TheaterScene'
-import SceneAsset from './SceneAsset'
+import TheaterScene from '../../components/TheaterScene'
+import PlacedImage from '../../components/PlacedImage'
 import Form from './Form'
 import { BACKGROUNDS, ASSETS } from '../../lib/sceneAssets'
 import { useIsMobile } from '../../hooks/useIsMobile'
@@ -77,7 +77,7 @@ function Exterior() {
         </text>
       )}
 
-      <SceneAsset
+      <PlacedImage
         asset={ASSETS.donateNow}
         centerX={pos.donateNow.centerX}
         centerY={pos.donateNow.centerY}
@@ -91,7 +91,7 @@ function Exterior() {
         }
         className="scene-button"
       />
-      <SceneAsset
+      <PlacedImage
         asset={ASSETS.contactUs}
         centerX={pos.contactUs.centerX}
         centerY={pos.contactUs.centerY}
@@ -99,12 +99,12 @@ function Exterior() {
         onClick={() => setIsFormOpen(true)}
         className="scene-button"
       />
-      <SceneAsset
+      <PlacedImage
         asset={ASSETS.viewOurProgress}
         centerX={pos.viewOurProgress.centerX}
         centerY={pos.viewOurProgress.centerY}
         scale={pos.viewOurProgress.scale}
-        onClick={() => navigate('/inside-theater')}
+        onClick={() => navigate('/interior')}
         className="scene-button"
       />
     </TheaterScene>
