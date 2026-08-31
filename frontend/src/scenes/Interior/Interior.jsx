@@ -46,7 +46,10 @@ function Interior() {
         width={CUTOUT.width}
         height={CUTOUT.height}
       >
-        <div xmlns="http://www.w3.org/1999/xhtml" className="interior-video-wrap">
+        <div
+          xmlns="http://www.w3.org/1999/xhtml"
+          className="interior-video-wrap"
+        >
           <Footage className="interior-video" />
         </div>
       </foreignObject>
