@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import TheaterScene from './scene/TheaterScene'
-import SceneAsset from './scene/SceneAsset'
+import { useNavigate } from 'react-router-dom'
+import TheaterScene from '../../components/TheaterScene'
+import PlacedImage from '../../components/PlacedImage'
 import Form from './Form'
-import { BACKGROUNDS, ASSETS } from '../lib/sceneAssets'
-import { useIsMobile } from '../lib/useIsMobile'
-import { useWindowWidth } from '../lib/useWindowWidth'
-import './Theater.css'
+import { BACKGROUNDS, ASSETS } from '../../lib/sceneAssets'
+import { useIsMobile } from '../../hooks/useIsMobile'
+import { useWindowWidth } from '../../hooks/useWindowWidth'
+import './Exterior.css'
 
 const POSITIONS = {
   desktop: {
@@ -27,16 +28,17 @@ function getMobileTitleTop(width) {
   return 8
 }
 
-function Theater() {
+function Exterior() {
+  const navigate = useNavigate()
   const isMobile = useIsMobile()
   const width = useWindowWidth()
-  const bg = isMobile ? BACKGROUNDS.theaterMobile : BACKGROUNDS.theater
+  const bg = isMobile ? BACKGROUNDS.exteriorMobile : BACKGROUNDS.exterior
   const pos = isMobile ? POSITIONS.mobile : POSITIONS.desktop
   const [isFormOpen, setIsFormOpen] = useState(false)
 
   return (
     <TheaterScene
-      className="theater"
+      className="exterior"
       bgSrc={bg.src}
       bgWidth={bg.width}
       bgHeight={bg.height}
@@ -75,7 +77,7 @@ function Theater() {
         </text>
       )}
 
-      <SceneAsset
+      <PlacedImage
         asset={ASSETS.donateNow}
         centerX={pos.donateNow.centerX}
         centerY={pos.donateNow.centerY}
@@ -89,7 +91,7 @@ function Theater() {
         }
         className="scene-button"
       />
-      <SceneAsset
+      <PlacedImage
         asset={ASSETS.contactUs}
         centerX={pos.contactUs.centerX}
         centerY={pos.contactUs.centerY}
@@ -97,20 +99,16 @@ function Theater() {
         onClick={() => setIsFormOpen(true)}
         className="scene-button"
       />
-      <SceneAsset
+      <PlacedImage
         asset={ASSETS.viewOurProgress}
         centerX={pos.viewOurProgress.centerX}
         centerY={pos.viewOurProgress.centerY}
         scale={pos.viewOurProgress.scale}
-        onClick={() =>
-          document
-            .getElementById('footage')
-            ?.scrollIntoView({ behavior: 'smooth' })
-        }
+        onClick={() => navigate('/interior')}
         className="scene-button"
       />
     </TheaterScene>
   )
 }
 
-export default Theater
+export default Exterior

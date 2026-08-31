@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { placeAsset } from '../../lib/sceneAssets'
+import { placeAsset } from '../lib/sceneAssets'
 
-function SceneAsset({
+function PlacedImage({
   asset,
   centerX,
   centerY,
@@ -47,4 +47,4 @@ function SceneAsset({
   )
 }
 
-export default SceneAsset
+export default PlacedImage

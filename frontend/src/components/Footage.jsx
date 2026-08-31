@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import './Footage.css'
-import { useIsMobile } from '../lib/useIsMobile'
+import { useIsMobile } from '../hooks/useIsMobile'
 
-function Footage() {
+function Footage({ className, style }) {
   const isMobile = useIsMobile()
   const API_BASE = import.meta.env.VITE_API_URL
   const videoSrc = isMobile
     ? `${API_BASE}/media/footage-mobile`
     : `${API_BASE}/media/footage`
+
   const videoRef = useRef(null)
   const [shouldLoad, setShouldLoad] = useState(false)
 
@@ -29,21 +29,20 @@ function Footage() {
   }, [shouldLoad])
 
   return (
-    <section id="footage" className="page footage">
-      <video
-        ref={videoRef}
-        key={videoSrc}
-        className="footage-video"
-        src={shouldLoad ? videoSrc : undefined}
-        preload="none"
-        fetchPriority="low"
-        autoPlay
-        muted
-        loop
-        playsInline
-        controls={false}
-      />
-    </section>
+    <video
+      ref={videoRef}
+      key={videoSrc}
+      className={className}
+      style={style}
+      src={shouldLoad ? videoSrc : undefined}
+      preload="none"
+      fetchPriority="low"
+      autoPlay
+      muted
+      loop
+      playsInline
+      controls={false}
+    />
   )
 }
 

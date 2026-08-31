@@ -73,8 +73,8 @@ describe('placeAsset', () => {
 })
 
 describe('BACKGROUNDS registry', () => {
-  it('has positive dimensions for theater', () => {
-    expect(BACKGROUNDS.theater.width).toBeGreaterThan(0)
-    expect(BACKGROUNDS.theater.height).toBeGreaterThan(0)
+  it('has positive dimensions for exterior', () => {
+    expect(BACKGROUNDS.exterior.width).toBeGreaterThan(0)
+    expect(BACKGROUNDS.exterior.height).toBeGreaterThan(0)
   })
 })

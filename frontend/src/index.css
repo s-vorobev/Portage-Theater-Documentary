@@ -1,6 +1,18 @@
 /* TEMPORARY TEXT FONT */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
+:root {
+  --color-bg: #000;
+  --color-surface: #fff;
+  --color-text: #fff;
+  --color-text-inverted: #222;
+  --color-brand: #a61b36;
+  --color-brand-accent: #b23a3a;
+  --color-warning: #ffe08a;
+  --color-disabled-bg: #d9d9d9;
+  --color-disabled-text: #999;
+}
+
 *,
 *::before,
 *::after {
@@ -22,6 +34,16 @@ body {
 #root {
   width: 100%;
   height: 100%;
+}
+
+.page {
+  background-color: var(--color-bg);
+  position: relative;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .grecaptcha-badge {
