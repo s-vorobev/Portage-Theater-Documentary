@@ -1,9 +1,9 @@
 import { generateFilename } from '../utils/generateFilename.js'
-import { HttpError } from '../utils/HttpError.js'
+import { HttpError } from '../utils/httpError.js'
 import { verifyRecaptcha } from './recaptchaService.js'
 import { isWithinRateLimit } from './rateLimitService.js'
-import { Submission } from '../models/Submission.js'
-import { SubmissionFile } from '../models/SubmissionFile.js'
+import { Submission } from '../models/submission.js'
+import { SubmissionFile } from '../models/submissionFile.js'
 import { insertSubmissionWithFiles } from '../repositories/submissionRepository.js'
 import { uploadFile, deleteFile } from '../clients/dropboxClient.js'
 import {
