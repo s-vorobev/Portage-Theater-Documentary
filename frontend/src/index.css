@@ -2,15 +2,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
 :root {
-  --color-bg: #000;
-  --color-surface: #fff;
-  --color-text: #fff;
-  --color-text-inverted: #222;
-  --color-brand: #a61b36;
-  --color-brand-accent: #b23a3a;
-  --color-warning: #ffe08a;
-  --color-disabled-bg: #d9d9d9;
-  --color-disabled-text: #999;
+  --color-bg: rgba(0, 0, 0, 1);
+  --color-surface: rgba(255, 255, 255, 1);
+  --color-text: rgba(255, 255, 255, 1);
+  --color-text-inverted: rgba(34, 34, 34, 1);
+  --color-brand: rgba(166, 27, 54, 1);
+  --color-brand-accent: rgba(178, 58, 58, 1);
+  --color-warning: rgba(255, 224, 138, 1);
+  --color-disabled-bg: rgba(217, 217, 217, 1);
+  --color-disabled-text: rgba(153, 153, 153, 1);
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-overlay-soft: rgba(0, 0, 0, 0.45);
+  --color-overlay-hover: rgba(0, 0, 0, 0.65);
+  --color-overlay-subtle: rgba(0, 0, 0, 0.25);
+  --color-surface-translucent: rgba(255, 255, 255, 0.12);
+  --color-border: rgba(255, 255, 255, 0.35);
+  --color-border-strong: rgba(255, 255, 255, 0.4);
 }
 
 *,
@@ -23,12 +30,14 @@ html {
   scroll-snap-type: y mandatory;
   overflow-y: scroll;
   height: 100%;
+  background-color: var(--color-bg);
 }
 
 body {
   margin: 0;
   padding: 0;
   height: 100%;
+  background-color: var(--color-bg);
 }
 
 #root {
