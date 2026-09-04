@@ -11,12 +11,12 @@ export async function submitForm(req, res) {
     })
   }
 
-  const submissionId = await createSubmission(
-    result.data,
-    req.files,
-    req.ip,
+  const submissionId = await createSubmission({
+    form: result.data,
+    files: req.files,
+    ipAddress: req.ip,
     recaptchaToken,
-  )
+  })
 
   res.status(201).json({ id: submissionId })
 }

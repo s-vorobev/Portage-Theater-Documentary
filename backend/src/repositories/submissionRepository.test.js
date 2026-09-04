@@ -5,9 +5,12 @@ const mockClient = {
   release: vi.fn(),
 }
 
+const mockQuery = vi.fn()
+
 vi.mock('../db/pool.js', () => ({
   pool: {
     connect: vi.fn(() => Promise.resolve(mockClient)),
+    query: mockQuery,
   },
 }))
 
@@ -16,11 +19,19 @@ vi.mock('../db/sql/loader.js', () => ({
     insertSubmission: 'INSERT INTO submissions (...) RETURNING submission_id;',
     insertSubmissionFile:
       'INSERT INTO submission_files (...) RETURNING file_id;',
+    selectSubmissionIds: 'SELECT submission_id FROM submissions ...;',
+    selectSubmission: 'SELECT ... FROM submissions WHERE submission_id = $1;',
+    selectSubmissionFiles:
+      'SELECT ... FROM submission_files WHERE submission_id = $1;',
   },
 }))
 
-import { insertSubmissionWithFiles } from './submissionRepository.js'
-import { pool } from '../db/pool.js'
+const {
+  insertSubmissionWithFiles,
+  getSubmissionIds,
+  getSubmissionWithFiles,
+} = await import('./submissionRepository.js')
+const { pool } = await import('../db/pool.js')
 
 const submission = {
   firstName: 'Sergei',
@@ -142,5 +153,101 @@ describe('insertSubmissionWithFiles', () => {
       ([sql]) => sql !== 'BEGIN' && sql !== 'COMMIT' && sql !== 'ROLLBACK',
     )
     expect(insertCalls).toHaveLength(1) // just the submission insert
+  })
+})
+
+describe('getSubmissionIds', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns the list of submission ids for the page', async () => {
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ submission_id: 'a' }, { submission_id: 'b' }],
+    })
+
+    const result = await getSubmissionIds(10, 20)
+
+    expect(mockQuery).toHaveBeenCalledWith(expect.any(String), [10, 20])
+    expect(result).toEqual(['a', 'b'])
+  })
+
+  it('returns an empty array when there are no submissions', async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [] })
+
+    const result = await getSubmissionIds(10, 0)
+
+    expect(result).toEqual([])
+  })
+})
+
+describe('getSubmissionWithFiles', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns null without querying files when the submission does not exist', async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [] })
+
+    const result = await getSubmissionWithFiles('missing-id')
+
+    expect(result).toBeNull()
+    expect(mockQuery).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns the submission view with its files', async () => {
+    const createdAt = new Date('2026-01-01T00:00:00Z')
+    mockQuery
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            first_name: 'Sergei',
+            last_name: 'Vorobev',
+            email: 'sergei@example.com',
+            phone: '9272060061',
+            message: 'Test message',
+            created_at: createdAt,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          { original_filename: 'a.jpg', generated_filename: 'uuid-a.jpg' },
+        ],
+      })
+
+    const result = await getSubmissionWithFiles('sub-id-1')
+
+    expect(mockQuery).toHaveBeenCalledTimes(2)
+    expect(result).toEqual({
+      firstName: 'Sergei',
+      lastName: 'Vorobev',
+      email: 'sergei@example.com',
+      phone: '9272060061',
+      message: 'Test message',
+      createdAt,
+      files: [{ originalFilename: 'a.jpg', generatedFilename: 'uuid-a.jpg' }],
+    })
+  })
+
+  it('returns an empty files list when the submission has no files', async () => {
+    mockQuery
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            first_name: 'Sergei',
+            last_name: 'Vorobev',
+            email: 'sergei@example.com',
+            phone: null,
+            message: 'Test message',
+            created_at: new Date('2026-01-01T00:00:00Z'),
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [] })
+
+    const result = await getSubmissionWithFiles('sub-id-1')
+
+    expect(result.files).toEqual([])
   })
 })

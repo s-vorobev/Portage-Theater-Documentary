@@ -52,15 +52,15 @@ describe('submitForm', () => {
 
     await submitForm(req, res)
 
-    expect(createSubmission).toHaveBeenCalledWith(
-      expect.objectContaining({
+    expect(createSubmission).toHaveBeenCalledWith({
+      form: expect.objectContaining({
         firstName: 'Sergei',
         email: 'sergei@example.com',
       }),
       files,
-      '203.0.113.5',
-      'valid-recaptcha-token',
-    )
+      ipAddress: '203.0.113.5',
+      recaptchaToken: 'valid-recaptcha-token',
+    })
   })
 
   it('does not leak recaptchaToken into the data passed for contract validation', async () => {
@@ -70,8 +70,9 @@ describe('submitForm', () => {
 
     await submitForm(req, res)
 
-    const [dataArg] = createSubmission.mock.calls[0]
-    expect(dataArg.recaptchaToken).toBeUndefined()
+    const [input] = createSubmission.mock.calls[0]
+    expect(input.form.recaptchaToken).toBeUndefined()
+    expect(input.recaptchaToken).toBe('valid-recaptcha-token')
   })
 
   it('returns 201 with the new submission id on success', async () => {

@@ -13,7 +13,8 @@ export const queries = {
   insertSubmissionFile: load('insertSubmissionFile.sql'),
   countRecentSubmissionsByIp: load('countRecentSubmissionsByIp.sql'),
   selectSubmissionIds: load('selectSubmissionIds.sql'),
-  selectSubmissionAndFiles: load('selectSubmissionAndFiles.sql'),
+  selectSubmission: load('selectSubmission.sql'),
+  selectSubmissionFiles: load('selectSubmissionFiles.sql'),
   selectContent: load('selectContent.sql'),
   updateContent: load('updateContent.sql'),
 }

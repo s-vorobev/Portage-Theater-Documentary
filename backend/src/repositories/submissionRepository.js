@@ -1,5 +1,6 @@
 import { pool } from '../db/pool.js'
 import { queries } from '../db/sql/loader.js'
+import { mapSubmissionView } from '../mappers/submissionViewMapper.js'
 
 export async function insertSubmissionWithFiles(submission, files) {
   const client = await pool.connect()
@@ -37,4 +38,26 @@ export async function insertSubmissionWithFiles(submission, files) {
   } finally {
     client.release()
   }
+}
+
+export async function getSubmissionIds(size, offset) {
+  const result = await pool.query(queries.selectSubmissionIds, [size, offset])
+  return result.rows.map((row) => row.submission_id)
+}
+
+export async function getSubmissionWithFiles(submissionId) {
+  const submissionResult = await pool.query(queries.selectSubmission, [
+    submissionId,
+  ])
+  const submissionRow = submissionResult.rows[0]
+
+  if (!submissionRow) {
+    return null
+  }
+
+  const filesResult = await pool.query(queries.selectSubmissionFiles, [
+    submissionId,
+  ])
+
+  return mapSubmissionView(submissionRow, filesResult.rows)
 }

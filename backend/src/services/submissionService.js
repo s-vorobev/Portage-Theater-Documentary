@@ -2,10 +2,9 @@ import { generateFilename } from '../utils/generateFilename.js'
 import { HttpError } from '../utils/httpError.js'
 import { verifyRecaptcha } from './recaptchaService.js'
 import { isWithinRateLimit } from './rateLimitService.js'
-import { Submission } from '../models/submission.js'
-import { SubmissionFile } from '../models/submissionFile.js'
 import { insertSubmissionWithFiles } from '../repositories/submissionRepository.js'
 import { uploadFile, deleteFile } from '../clients/dropboxClient.js'
+import { toSubmission, toSubmissionFile } from '../mappers/submissionMapper.js'
 import {
   ACCEPTED_FILE_TYPES,
   FALLBACK_EMAIL,
@@ -18,13 +17,13 @@ async function rollbackUploads(paths) {
   await Promise.allSettled(paths.map((path) => deleteFile(path)))
 }
 
-export async function createSubmission(
-  data,
-  uploadedFiles = [],
+export async function createSubmission({
+  form,
+  files = [],
   ipAddress,
   recaptchaToken,
-) {
-  const invalidType = uploadedFiles.filter(
+}) {
+  const invalidType = files.filter(
     (f) => !ACCEPTED_FILE_TYPES.includes(f.mimetype),
   )
   if (invalidType.length > 0) {
@@ -34,7 +33,7 @@ export async function createSubmission(
     )
   }
 
-  const totalBytes = uploadedFiles.reduce((sum, f) => sum + f.size, 0)
+  const totalBytes = files.reduce((sum, f) => sum + f.size, 0)
   if (totalBytes > UPLOAD_LIMITS.maxTotalSizeBytes) {
     throw new HttpError(
       400,
@@ -61,20 +60,12 @@ export async function createSubmission(
   const fileRecords = []
 
   try {
-    for (const file of uploadedFiles) {
+    for (const file of files) {
       const generatedFilename = generateFilename(file.originalname)
       const dropboxPath = await uploadFile(file.buffer, generatedFilename)
 
       uploadedPaths.push(dropboxPath)
-      fileRecords.push(
-        new SubmissionFile({
-          originalFilename: file.originalname,
-          generatedFilename,
-          dropboxPath,
-          mimeType: file.mimetype,
-          fileSizeBytes: file.size,
-        }),
-      )
+      fileRecords.push(toSubmissionFile(file, generatedFilename, dropboxPath))
     }
   } catch (err) {
     console.error(
@@ -88,17 +79,11 @@ export async function createSubmission(
     )
   }
 
-  const submission = new Submission({
-    firstName: data.firstName,
-    lastName: data.lastName,
-    email: data.email,
-    phone: data.phone ?? null,
-    message: data.message,
-    ipAddress,
-  })
-
   try {
-    return await insertSubmissionWithFiles(submission, fileRecords)
+    return await insertSubmissionWithFiles(
+      toSubmission(form, ipAddress),
+      fileRecords,
+    )
   } catch (err) {
     console.error(
       'DB insert failed after successful upload, rolling back Dropbox files:',
