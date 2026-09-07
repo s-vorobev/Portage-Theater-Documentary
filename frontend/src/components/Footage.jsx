@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { apiUrl, endpoints } from '../lib/api'
 
 function Footage({ className, style }) {
   const isMobile = useIsMobile()
-  const API_BASE = import.meta.env.VITE_API_URL
   const videoSrc = isMobile
-    ? `${API_BASE}/media/footage-mobile`
-    : `${API_BASE}/media/footage`
+    ? apiUrl(endpoints.footageMobile)
+    : apiUrl(endpoints.footage)
 
   const videoRef = useRef(null)
   const [shouldLoad, setShouldLoad] = useState(false)

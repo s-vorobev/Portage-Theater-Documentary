@@ -15,9 +15,9 @@ app.set('trust proxy', true)
 
 app.use(cors({ origin: env.FRONTEND_URL }))
 app.use(express.json())
-app.use('/api', submissionRoutes)
-app.use(mediaRoutes)
-app.use(contentRoutes)
+app.use('/api/v1', submissionRoutes)
+app.use('/api/v1', mediaRoutes)
+app.use('/api/v1', contentRoutes)
 
 const MULTER_ERROR_MESSAGES = {
   LIMIT_FILE_SIZE: `One of your files is too large. You can email your submission to ${FALLBACK_EMAIL} instead.`,

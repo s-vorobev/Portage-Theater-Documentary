@@ -2,14 +2,13 @@ import { useState, useEffect } from 'react'
 import './Form.css'
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { countWords, formatBytes } from '../../lib/format'
+import { apiUrl, endpoints } from '../../lib/api'
 import {
   MAX_MESSAGE_WORDS,
   MAX_FILES,
   MAX_FILE_SIZE_BYTES,
   selectFiles,
 } from '../../lib/uploadRules'
-
-const API_URL = import.meta.env.VITE_API_URL
 
 function Form({ isOpen, onClose }) {
   const { executeRecaptcha } = useGoogleReCaptcha()
@@ -94,7 +93,7 @@ function Form({ isOpen, onClose }) {
       formData.set('recaptchaToken', recaptchaToken)
       files.forEach((file) => formData.append('media', file))
 
-      const response = await fetch(`${API_URL}/api/submit`, {
+      const response = await fetch(apiUrl(endpoints.submit), {
         method: 'POST',
         body: formData,
       })
