@@ -7,6 +7,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
 
   RECAPTCHA_SECRET_KEY: z.string().min(1),
+  ADMIN_TOKEN: z.string().min(16),
   DROPBOX_APP_KEY: z.string().min(1),
   DROPBOX_APP_SECRET: z.string().min(1),
   DROPBOX_REFRESH_TOKEN: z.string().min(1),
