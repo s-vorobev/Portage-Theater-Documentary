@@ -5,15 +5,14 @@ vi.mock('../services/contentService.js', () => ({
   updateContent: vi.fn(),
 }))
 
-import { getContent, putContent } from './contentController.js'
-import {
-  getContent as fetchContent,
-  updateContent as saveContent,
-} from '../services/contentService.js'
+import { getContent, updateContent } from './contentController.js'
+import * as contentService from '../services/contentService.js'
 
 function makeRes() {
   const res = {}
   res.json = vi.fn().mockReturnValue(res)
+  res.status = vi.fn().mockReturnValue(res)
+  res.end = vi.fn().mockReturnValue(res)
   return res
 }
 
@@ -25,19 +24,19 @@ describe('contentController', () => {
   describe('getContent', () => {
     it('responds with the content for the slug', async () => {
       const content = { contentId: 'id-1', slug: 'about', body: 'Hello' }
-      fetchContent.mockResolvedValueOnce(content)
+      contentService.getContent.mockResolvedValueOnce(content)
 
       const req = { params: { slug: 'about' } }
       const res = makeRes()
 
       await getContent(req, res)
 
-      expect(fetchContent).toHaveBeenCalledWith('about')
+      expect(contentService.getContent).toHaveBeenCalledWith('about')
       expect(res.json).toHaveBeenCalledWith(content)
     })
 
     it('propagates a service error', async () => {
-      fetchContent.mockRejectedValueOnce(new Error('boom'))
+      contentService.getContent.mockRejectedValueOnce(new Error('boom'))
 
       await expect(
         getContent({ params: { slug: 'about' } }, makeRes()),
@@ -45,27 +44,32 @@ describe('contentController', () => {
     })
   })
 
-  describe('putContent', () => {
-    it('updates the content and responds with the result', async () => {
-      const content = { contentId: 'id-1', slug: 'about', body: 'New' }
-      saveContent.mockResolvedValueOnce(content)
+  describe('updateContent', () => {
+    it('updates the content and responds with 204 without a body', async () => {
+      contentService.updateContent.mockResolvedValueOnce({
+        contentId: 'id-1',
+        slug: 'about',
+        body: 'New',
+      })
 
       const req = { params: { slug: 'about' }, body: { body: 'New' } }
       const res = makeRes()
 
-      await putContent(req, res)
+      await updateContent(req, res)
 
-      expect(saveContent).toHaveBeenCalledWith('about', 'New')
-      expect(res.json).toHaveBeenCalledWith(content)
+      expect(contentService.updateContent).toHaveBeenCalledWith('about', 'New')
+      expect(res.status).toHaveBeenCalledWith(204)
+      expect(res.end).toHaveBeenCalled()
+      expect(res.json).not.toHaveBeenCalled()
     })
 
     it('passes undefined body when none is provided', async () => {
-      saveContent.mockResolvedValueOnce({})
+      contentService.updateContent.mockResolvedValueOnce({})
 
       const req = { params: { slug: 'about' }, body: {} }
-      await putContent(req, makeRes())
+      await updateContent(req, makeRes())
 
-      expect(saveContent).toHaveBeenCalledWith('about', undefined)
+      expect(contentService.updateContent).toHaveBeenCalledWith('about', undefined)
     })
   })
 })

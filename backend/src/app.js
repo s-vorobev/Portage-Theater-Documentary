@@ -11,13 +11,15 @@ import contentRoutes from './routes/contentRoutes.js'
 
 export const app = express()
 
+const API_PREFIX = '/api/v1'
+
 app.set('trust proxy', true)
 
 app.use(cors({ origin: env.FRONTEND_URL }))
 app.use(express.json())
-app.use('/api/v1', submissionRoutes)
-app.use('/api/v1', mediaRoutes)
-app.use('/api/v1', contentRoutes)
+app.use(API_PREFIX, submissionRoutes)
+app.use(API_PREFIX, mediaRoutes)
+app.use(API_PREFIX, contentRoutes)
 
 const MULTER_ERROR_MESSAGES = {
   LIMIT_FILE_SIZE: `One of your files is too large. You can email your submission to ${FALLBACK_EMAIL} instead.`,

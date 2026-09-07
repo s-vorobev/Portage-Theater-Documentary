@@ -1,9 +1,5 @@
 import { submissionContract } from '../contracts/submissionContract.js'
-import {
-  createSubmission,
-  listSubmissionIds,
-  getSubmissionById,
-} from '../services/submissionService.js'
+import * as submissionService from '../services/submissionService.js'
 
 const DEFAULT_SIZE = 10
 const MAX_SIZE = 100
@@ -31,23 +27,23 @@ export async function submitForm(req, res) {
     })
   }
 
-  const submissionId = await createSubmission({
+  await submissionService.createSubmission({
     form: result.data,
     files: req.files,
     ipAddress: req.ip,
     recaptchaToken,
   })
 
-  res.status(201).json({ id: submissionId })
+  res.status(201).end()
 }
 
 export async function listSubmissions(req, res) {
   const { size, offset } = parsePagination(req.query)
-  const ids = await listSubmissionIds(size, offset)
+  const ids = await submissionService.listSubmissionIds(size, offset)
   res.json({ ids })
 }
 
 export async function getSubmission(req, res) {
-  const submission = await getSubmissionById(req.params.id)
+  const submission = await submissionService.getSubmissionById(req.params.id)
   res.json(submission)
 }

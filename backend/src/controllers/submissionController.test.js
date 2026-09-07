@@ -25,6 +25,7 @@ function makeRes() {
   const res = {}
   res.status = vi.fn().mockReturnValue(res)
   res.json = vi.fn().mockReturnValue(res)
+  res.end = vi.fn().mockReturnValue(res)
   return res
 }
 
@@ -81,7 +82,7 @@ describe('submitForm', () => {
     expect(input.recaptchaToken).toBe('valid-recaptcha-token')
   })
 
-  it('returns 201 with the new submission id on success', async () => {
+  it('returns 201 without a body on success', async () => {
     createSubmission.mockResolvedValue('new-id-123')
     const req = { body: validBody, files: [], ip: '127.0.0.1' }
     const res = makeRes()
@@ -89,7 +90,8 @@ describe('submitForm', () => {
     await submitForm(req, res)
 
     expect(res.status).toHaveBeenCalledWith(201)
-    expect(res.json).toHaveBeenCalledWith({ id: 'new-id-123' })
+    expect(res.end).toHaveBeenCalled()
+    expect(res.json).not.toHaveBeenCalled()
   })
 
   it('propagates a thrown error from the service instead of handling it locally', async () => {

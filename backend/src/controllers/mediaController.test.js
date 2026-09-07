@@ -8,11 +8,7 @@ const { getFootage, getFootageMobile } = await import('./mediaController.js')
 const { getPresignedUrl } = await import('../clients/bucketClient.js')
 
 function createMockRes() {
-  return {
-    redirect: vi.fn(),
-    status: vi.fn().mockReturnThis(),
-    send: vi.fn(),
-  }
+  return { redirect: vi.fn() }
 }
 
 describe('mediaController', () => {
@@ -32,19 +28,15 @@ describe('mediaController', () => {
 
       expect(getPresignedUrl).toHaveBeenCalledWith('footage.mp4')
       expect(res.redirect).toHaveBeenCalledWith(fakeUrl)
-      expect(res.status).not.toHaveBeenCalled()
     })
 
-    it('returns a 500 if presigning fails', async () => {
+    it('propagates the error when presigning fails', async () => {
       getPresignedUrl.mockRejectedValueOnce(new Error('bucket unreachable'))
 
       const res = createMockRes()
 
-      await getFootage({}, res)
-
+      await expect(getFootage({}, res)).rejects.toThrow('bucket unreachable')
       expect(res.redirect).not.toHaveBeenCalled()
-      expect(res.status).toHaveBeenCalledWith(500)
-      expect(res.send).toHaveBeenCalledWith('Could not load media')
     })
   })
 
@@ -62,15 +54,15 @@ describe('mediaController', () => {
       expect(res.redirect).toHaveBeenCalledWith(fakeUrl)
     })
 
-    it('returns a 500 if presigning fails', async () => {
+    it('propagates the error when presigning fails', async () => {
       getPresignedUrl.mockRejectedValueOnce(new Error('bucket unreachable'))
 
       const res = createMockRes()
 
-      await getFootageMobile({}, res)
-
-      expect(res.status).toHaveBeenCalledWith(500)
-      expect(res.send).toHaveBeenCalledWith('Could not load media')
+      await expect(getFootageMobile({}, res)).rejects.toThrow(
+        'bucket unreachable',
+      )
+      expect(res.redirect).not.toHaveBeenCalled()
     })
   })
 })
