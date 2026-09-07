@@ -2,7 +2,11 @@ import { generateFilename } from '../utils/generateFilename.js'
 import { HttpError } from '../utils/httpError.js'
 import { verifyRecaptcha } from './recaptchaService.js'
 import { isWithinRateLimit } from './rateLimitService.js'
-import { insertSubmissionWithFiles } from '../repositories/submissionRepository.js'
+import {
+  insertSubmissionWithFiles,
+  getSubmissionIds,
+  getSubmissionWithFiles,
+} from '../repositories/submissionRepository.js'
 import { uploadFile, deleteFile } from '../clients/dropboxClient.js'
 import { toSubmission, toSubmissionFile } from '../mappers/submissionMapper.js'
 import {
@@ -95,4 +99,18 @@ export async function createSubmission({
       'Failed to save your submission. Please try again.',
     )
   }
+}
+
+export async function listSubmissionIds(size, offset) {
+  return getSubmissionIds(size, offset)
+}
+
+export async function getSubmissionById(submissionId) {
+  const submission = await getSubmissionWithFiles(submissionId)
+
+  if (!submission) {
+    throw new HttpError(404, 'Submission not found')
+  }
+
+  return submission
 }

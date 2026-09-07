@@ -7,6 +7,8 @@ vi.mock('../clients/dropboxClient.js', () => ({
 
 vi.mock('../repositories/submissionRepository.js', () => ({
   insertSubmissionWithFiles: vi.fn(),
+  getSubmissionIds: vi.fn(),
+  getSubmissionWithFiles: vi.fn(),
 }))
 
 vi.mock('./recaptchaService.js', () => ({
@@ -17,9 +19,17 @@ vi.mock('./rateLimitService.js', () => ({
   isWithinRateLimit: vi.fn(),
 }))
 
-import { createSubmission } from './submissionService.js'
+import {
+  createSubmission,
+  listSubmissionIds,
+  getSubmissionById,
+} from './submissionService.js'
 import { uploadFile, deleteFile } from '../clients/dropboxClient.js'
-import { insertSubmissionWithFiles } from '../repositories/submissionRepository.js'
+import {
+  insertSubmissionWithFiles,
+  getSubmissionIds,
+  getSubmissionWithFiles,
+} from '../repositories/submissionRepository.js'
 import { verifyRecaptcha } from './recaptchaService.js'
 import { isWithinRateLimit } from './rateLimitService.js'
 
@@ -202,5 +212,36 @@ describe('createSubmission', () => {
     expect(uploadFile).not.toHaveBeenCalled()
     expect(insertSubmissionWithFiles).toHaveBeenCalledTimes(1)
     expect(result).toBe('id-no-files')
+  })
+})
+
+describe('listSubmissionIds', () => {
+  it('delegates to the repository and returns the ids', async () => {
+    getSubmissionIds.mockResolvedValueOnce(['a', 'b'])
+
+    const result = await listSubmissionIds(10, 20)
+
+    expect(getSubmissionIds).toHaveBeenCalledWith(10, 20)
+    expect(result).toEqual(['a', 'b'])
+  })
+})
+
+describe('getSubmissionById', () => {
+  it('returns the submission when found', async () => {
+    const submission = { firstName: 'Sergei', files: [] }
+    getSubmissionWithFiles.mockResolvedValueOnce(submission)
+
+    const result = await getSubmissionById('id-1')
+
+    expect(getSubmissionWithFiles).toHaveBeenCalledWith('id-1')
+    expect(result).toBe(submission)
+  })
+
+  it('throws a 404 when the submission does not exist', async () => {
+    getSubmissionWithFiles.mockResolvedValueOnce(null)
+
+    await expect(getSubmissionById('missing')).rejects.toMatchObject({
+      status: 404,
+    })
   })
 })
