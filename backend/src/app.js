@@ -7,6 +7,7 @@ import { env } from './config/env.js'
 import { FALLBACK_EMAIL } from './config/constants.js'
 import submissionRoutes from './routes/submissionRoutes.js'
 import mediaRoutes from './routes/mediaRoutes.js'
+import contentRoutes from './routes/contentRoutes.js'
 
 export const app = express()
 
@@ -16,6 +17,7 @@ app.use(cors({ origin: env.FRONTEND_URL }))
 app.use(express.json())
 app.use('/api', submissionRoutes)
 app.use(mediaRoutes)
+app.use(contentRoutes)
 
 const MULTER_ERROR_MESSAGES = {
   LIMIT_FILE_SIZE: `One of your files is too large. You can email your submission to ${FALLBACK_EMAIL} instead.`,
