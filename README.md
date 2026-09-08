@@ -66,7 +66,7 @@ reCAPTCHA v3 runs invisibly — there's no checkbox widget. A token is generated
 
 ## Backend
 
-Express API handling community form submissions — validates incoming data, verifies reCAPTCHA and rate limits, uploads media to Dropbox, and stores submission records in Postgres. Also serves video assets from Railway bucket storage via presigned URLs.
+Express API handling community form submissions — validates incoming data, verifies reCAPTCHA and rate limits, uploads media to Dropbox, and stores submission records in Postgres. Also serves video assets from Railway bucket storage via presigned URLs, manages editable page content, and exposes admin-only endpoints protected by a bearer token.
 
 ### Tech Stack
 
@@ -107,6 +107,8 @@ FRONTEND_URL=http://localhost:5173
 
 RECAPTCHA_SECRET_KEY=
 
+ADMIN_TOKEN=
+
 BUCKET_ENDPOINT=
 BUCKET_REGION=auto
 BUCKET_ACCESS_KEY=
@@ -125,22 +127,51 @@ BUCKET_NAME=
 | `DROPBOX_UPLOAD_FOLDER` | No — defaults to `/dev`                  | Folder path in Dropbox where uploaded media is stored.                                                                                                                                                                                               |
 | `FRONTEND_URL`          | No — defaults to `http://localhost:5173` | Used for CORS — must match wherever the frontend is actually running, or browser requests to the API will be blocked.                                                                                                                                |
 | `RECAPTCHA_SECRET_KEY`  | **Yes**                                  | Private reCAPTCHA v3 secret key from the [reCAPTCHA admin console](https://www.google.com/recaptcha/admin) (pairs with the frontend's `VITE_RECAPTCHA_SITE_KEY`). Never exposed to the browser — used server-side only to verify tokens with Google. |
+| `ADMIN_TOKEN`           | **Yes**                                  | Shared secret for the admin endpoints (see [Admin authentication](#admin-authentication)). Sent by clients as `Authorization: Bearer <token>`. Must be at least 16 characters — generate one with `openssl rand -hex 32`.                        |
 | `BUCKET_ENDPOINT`       | **Yes**                                  | S3-compatible endpoint URL for the Railway bucket. Use the value as given in Railway's bucket credentials — it already includes the `https://` scheme, don't prepend it again.                                                                       |
 | `BUCKET_REGION`         | No — defaults to `auto`                  | Region for the S3 client. Railway buckets use `auto`.                                                                                                                                                                                                |
 | `BUCKET_ACCESS_KEY`     | **Yes**                                  | From the Railway bucket's Credentials tab. Pass into this service via a Variable Reference rather than copy-pasting, so it stays in sync if rotated.                                                                                                 |
 | `BUCKET_SECRET_KEY`     | **Yes**                                  | Same location as above — pass via Variable Reference.                                                                                                                                                                                                |
 | `BUCKET_NAME`           | **Yes**                                  | The bucket's name as shown in Railway (display name + hash suffix).                                                                                                                                                                                  |
 
-Run `sql/schema.sql` once against a fresh Postgres database before the API can store anything — it's not run automatically. Easiest via Railway's Postgres service → Data/query console → paste and execute the file's contents.
+Run `sql/schema.sql` once against a fresh Postgres database before the API can store anything — it's not run automatically. Easiest via Railway's Postgres service → Data/query console → paste and execute the file's contents. It creates the `submissions`, `submission_files`, and `content` tables.
 
 ### Submission protections
 
-The `/api/submit` endpoint is protected by two independent checks, both enforced server-side regardless of what the frontend sends:
+The `/api/v1/submit` endpoint is protected by two independent checks, both enforced server-side regardless of what the frontend sends:
 
 - **reCAPTCHA v3** — every submission must include a valid token, generated fresh at submit time. The backend verifies it against Google (`recaptchaService.js`) and rejects the request if verification fails, the score falls below threshold, or the action name doesn't match.
 - **IP-based rate limiting** — each IP is limited to **2 submissions per 7 days** (`rateLimitService.js` / `rateLimitRepository.js`). Once the limit is hit, the API responds with a `429` and a message pointing the person to email their submission to `footage@portagetheaterdocumentary.com` instead.
 
 Both checks run before any file upload or database write, so a rejected request never touches Dropbox or Postgres.
+
+### API
+
+All endpoints are versioned under `/api/v1`.
+
+| Method | Endpoint                       | Auth    | Description                                   |
+| ------ | ------------------------------ | ------- | --------------------------------------------- |
+| POST   | `/api/v1/submit`               | Public  | Create a submission (multipart form + files)  |
+| GET    | `/api/v1/submissions`          | Admin   | List submission IDs (`size`, `offset`)        |
+| GET    | `/api/v1/submissions/:id`      | Admin   | Get a single submission with its files        |
+| GET    | `/api/v1/content/:slug`        | Public  | Get page content by slug                      |
+| PUT    | `/api/v1/content/:slug`        | Admin   | Update page content by slug                   |
+| GET    | `/api/v1/media/footage`        | Public  | Redirect to a presigned video URL             |
+| GET    | `/api/v1/media/footage-mobile` | Public  | Redirect to a presigned mobile video URL      |
+
+GET requests return the requested resource. `POST` and `PUT` return only a status code (`201` / `204`) with no response body.
+
+### Admin authentication
+
+Endpoints marked **Admin** require an `Authorization: Bearer <token>` header whose value matches the `ADMIN_TOKEN` environment variable. There is no user database — it's a single shared secret checked by `middleware/requireAdmin.js` using a constant-time comparison. Requests without a valid token receive `401 Unauthorized`.
+
+Generate a strong token locally:
+
+```bash
+openssl rand -hex 32
+```
+
+Set the result as `ADMIN_TOKEN` in your local `.env` and in the deployed environment.
 
 ### Scripts
 
