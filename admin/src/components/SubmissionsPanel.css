@@ -38,32 +38,45 @@
   font-size: 1.05rem;
 }
 
-.submission-contact {
+.submission-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 0.75rem;
-  margin: 0;
-  font-size: 0.8rem;
 }
 
-.submission-contact a {
+.submission-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.submission-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.submission-value {
+  margin: 0;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+a.submission-value {
   color: var(--color-brand-accent);
   text-decoration: none;
 }
 
-.submission-contact a:hover {
+a.submission-value:hover {
   text-decoration: underline;
 }
 
-.submission-phone {
-  opacity: 0.8;
-}
-
 .submission-message {
-  margin: 0;
   font-size: 0.85rem;
   line-height: 1.5;
-  overflow-wrap: anywhere;
   white-space: pre-line;
 }
 
@@ -71,7 +84,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  margin: 0.25rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
   font-size: 0.75rem;

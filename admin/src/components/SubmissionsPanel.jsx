@@ -29,21 +29,38 @@ function SubmissionCard({ submission }) {
         {firstName} {lastName}
       </h2>
 
-      <p className="submission-contact">
-        <a href={`mailto:${email}`}>{email}</a>
-        {phone && <span className="submission-phone">{phone}</span>}
-      </p>
+      <div className="submission-row">
+        <div className="submission-field">
+          <span className="submission-label">Email</span>
+          <a className="submission-value" href={`mailto:${email}`}>
+            {email}
+          </a>
+        </div>
 
-      <p className="submission-message">{message}</p>
+        {phone && (
+          <div className="submission-field">
+            <span className="submission-label">Phone</span>
+            <span className="submission-value">{phone}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="submission-field">
+        <span className="submission-label">Message</span>
+        <p className="submission-value submission-message">{message}</p>
+      </div>
 
       {files.length > 0 && (
-        <ul className="submission-files">
-          {files.map((file) => (
-            <li key={file.generatedFilename ?? file.originalFilename}>
-              {file.originalFilename}
-            </li>
-          ))}
-        </ul>
+        <div className="submission-field">
+          <span className="submission-label">Files</span>
+          <ul className="submission-files">
+            {files.map((file) => (
+              <li key={file.generatedFilename ?? file.originalFilename}>
+                {file.originalFilename}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </article>
   )
