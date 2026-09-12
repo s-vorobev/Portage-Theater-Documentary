@@ -1,0 +1,124 @@
+.submissions-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100vh;
+  padding: 1.5rem;
+  border-right: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.submission-grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  align-content: start;
+  gap: 1rem;
+  padding-right: 0.25rem;
+}
+
+.submission-grid > .panel-message {
+  grid-column: 1 / -1;
+}
+
+.submission-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--color-surface-translucent);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.submission-name {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.submission-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.submission-contact a {
+  color: var(--color-brand-accent);
+  text-decoration: none;
+}
+
+.submission-contact a:hover {
+  text-decoration: underline;
+}
+
+.submission-phone {
+  opacity: 0.8;
+}
+
+.submission-message {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.submission-files {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.submission-files li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  padding-top: 1rem;
+}
+
+.page-button {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.page-button:hover:not(:disabled) {
+  background: var(--color-surface-translucent);
+}
+
+.page-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-button-active {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+}
+
+.page-ellipsis {
+  padding: 0 0.25rem;
+  opacity: 0.6;
+}

@@ -15,7 +15,19 @@ const API_PREFIX = '/api/v1'
 
 app.set('trust proxy', true)
 
-app.use(cors({ origin: env.FRONTEND_URL }))
+const LOCAL_ORIGIN = /^http:\/\/localhost:\d+$/
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      const allowed =
+        !origin ||
+        origin === env.FRONTEND_URL ||
+        (env.NODE_ENV === 'development' && LOCAL_ORIGIN.test(origin))
+      callback(null, allowed)
+    },
+  }),
+)
 app.use(express.json())
 app.use(API_PREFIX, submissionRoutes)
 app.use(API_PREFIX, mediaRoutes)

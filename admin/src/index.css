@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+:root {
+  --color-bg: rgba(0, 0, 0, 1);
+  --color-surface: rgba(255, 255, 255, 1);
+  --color-text: rgba(255, 255, 255, 1);
+  --color-text-inverted: rgba(34, 34, 34, 1);
+  --color-brand: rgba(166, 27, 54, 1);
+  --color-brand-accent: rgba(178, 58, 58, 1);
+  --color-warning: rgba(255, 224, 138, 1);
+  --color-disabled-bg: rgba(217, 217, 217, 1);
+  --color-disabled-text: rgba(153, 153, 153, 1);
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-overlay-soft: rgba(0, 0, 0, 0.45);
+  --color-overlay-hover: rgba(0, 0, 0, 0.65);
+  --color-overlay-subtle: rgba(0, 0, 0, 0.25);
+  --color-surface-translucent: rgba(255, 255, 255, 0.12);
+  --color-border: rgba(255, 255, 255, 0.35);
+  --color-border-strong: rgba(255, 255, 255, 0.4);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
