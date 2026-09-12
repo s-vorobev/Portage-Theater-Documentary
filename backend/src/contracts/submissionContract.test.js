@@ -62,6 +62,48 @@ describe('submissionContract', () => {
     expect(result.success).toBe(true)
   })
 
+  it('accepts a 10-digit phone number', () => {
+    const result = submissionContract.safeParse({
+      ...validData,
+      phone: '9272060061',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('strips formatting from a phone number', () => {
+    for (const [phone, expected] of [
+      ['927-206-0061', '9272060061'],
+      ['(927) 206-0061', '9272060061'],
+      ['927.206.0061', '9272060061'],
+    ]) {
+      const result = submissionContract.safeParse({ ...validData, phone })
+      expect(result.success).toBe(true)
+      expect(result.data.phone).toBe(expected)
+    }
+  })
+
+  it('rejects a phone that is not exactly 10 digits', () => {
+    for (const phone of ['12345', '123456789', '12345678901']) {
+      const result = submissionContract.safeParse({ ...validData, phone })
+      expect(result.success).toBe(false)
+    }
+  })
+
+  it('treats a phone with no digits as null', () => {
+    const result = submissionContract.safeParse({
+      ...validData,
+      phone: 'call-me-maybe',
+    })
+    expect(result.success).toBe(true)
+    expect(result.data.phone).toBeNull()
+  })
+
+  it('treats a blank phone as null', () => {
+    const result = submissionContract.safeParse({ ...validData, phone: '   ' })
+    expect(result.success).toBe(true)
+    expect(result.data.phone).toBeNull()
+  })
+
   it('rejects a missing message', () => {
     const { message, ...rest } = validData
     const result = submissionContract.safeParse(rest)
