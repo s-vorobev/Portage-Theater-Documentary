@@ -1,14 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-vi.mock('../clients/bucketClient.js', () => ({
-  getPresignedUrl: vi.fn(),
+vi.mock('../services/mediaService.js', () => ({
+  streamFootage: vi.fn(),
+  streamFootageMobile: vi.fn(),
 }))
 
 const { getFootage, getFootageMobile } = await import('./mediaController.js')
-const { getPresignedUrl } = await import('../clients/bucketClient.js')
+const { streamFootage, streamFootageMobile } = await import(
+  '../services/mediaService.js'
+)
+
+function createMockBody() {
+  return { on: vi.fn(), pipe: vi.fn() }
+}
 
 function createMockRes() {
-  return { redirect: vi.fn() }
+  return {
+    setHeader: vi.fn(),
+    status: vi.fn(),
+    end: vi.fn(),
+    destroy: vi.fn(),
+  }
 }
 
 describe('mediaController', () => {
@@ -16,53 +28,89 @@ describe('mediaController', () => {
     vi.clearAllMocks()
   })
 
-  describe('getFootage', () => {
-    it('redirects to the presigned URL for footage.mp4', async () => {
-      const fakeUrl =
-        'https://storage.railway.app/test-bucket/footage.mp4?signature=abc'
-      getPresignedUrl.mockResolvedValueOnce(fakeUrl)
-
-      const res = createMockRes()
-
-      await getFootage({}, res)
-
-      expect(getPresignedUrl).toHaveBeenCalledWith('footage.mp4')
-      expect(res.redirect).toHaveBeenCalledWith(fakeUrl)
+  it('streams the full object when no range is requested', async () => {
+    const body = createMockBody()
+    streamFootage.mockResolvedValueOnce({
+      size: 1000,
+      contentType: 'video/mp4',
+      range: { type: 'none' },
+      body,
     })
 
-    it('propagates the error when presigning fails', async () => {
-      getPresignedUrl.mockRejectedValueOnce(new Error('bucket unreachable'))
+    const res = createMockRes()
+    await getFootage({ headers: {} }, res)
 
-      const res = createMockRes()
-
-      await expect(getFootage({}, res)).rejects.toThrow('bucket unreachable')
-      expect(res.redirect).not.toHaveBeenCalled()
-    })
+    expect(streamFootage).toHaveBeenCalledWith(undefined)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.setHeader).toHaveBeenCalledWith('Accept-Ranges', 'bytes')
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'video/mp4')
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Length', 1000)
+    expect(body.pipe).toHaveBeenCalledWith(res)
   })
 
-  describe('getFootageMobile', () => {
-    it('redirects to the presigned URL for footage_mobile.mov', async () => {
-      const fakeUrl =
-        'https://storage.railway.app/test-bucket/footage_mobile.mov?signature=xyz'
-      getPresignedUrl.mockResolvedValueOnce(fakeUrl)
-
-      const res = createMockRes()
-
-      await getFootageMobile({}, res)
-
-      expect(getPresignedUrl).toHaveBeenCalledWith('footage_mobile.mov')
-      expect(res.redirect).toHaveBeenCalledWith(fakeUrl)
+  it('streams a partial object for a satisfiable range', async () => {
+    const body = createMockBody()
+    streamFootage.mockResolvedValueOnce({
+      size: 1000,
+      contentType: 'video/mp4',
+      range: { type: 'satisfiable', start: 0, end: 499 },
+      body,
     })
 
-    it('propagates the error when presigning fails', async () => {
-      getPresignedUrl.mockRejectedValueOnce(new Error('bucket unreachable'))
+    const res = createMockRes()
+    await getFootage({ headers: { range: 'bytes=0-499' } }, res)
 
-      const res = createMockRes()
+    expect(streamFootage).toHaveBeenCalledWith('bytes=0-499')
+    expect(res.status).toHaveBeenCalledWith(206)
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Content-Range',
+      'bytes 0-499/1000',
+    )
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Length', 500)
+    expect(body.pipe).toHaveBeenCalledWith(res)
+  })
 
-      await expect(getFootageMobile({}, res)).rejects.toThrow(
-        'bucket unreachable',
-      )
-      expect(res.redirect).not.toHaveBeenCalled()
+  it('responds 416 for an unsatisfiable range', async () => {
+    streamFootage.mockResolvedValueOnce({
+      size: 1000,
+      contentType: 'video/mp4',
+      range: { type: 'unsatisfiable' },
+      body: null,
     })
+
+    const res = createMockRes()
+    await getFootage({ headers: { range: 'bytes=5000-' } }, res)
+
+    expect(res.status).toHaveBeenCalledWith(416)
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Range', 'bytes */1000')
+    expect(res.end).toHaveBeenCalled()
+  })
+
+  it('streams the mobile footage', async () => {
+    const body = createMockBody()
+    streamFootageMobile.mockResolvedValueOnce({
+      size: 200,
+      contentType: 'video/quicktime',
+      range: { type: 'none' },
+      body,
+    })
+
+    const res = createMockRes()
+    await getFootageMobile({ headers: {} }, res)
+
+    expect(streamFootageMobile).toHaveBeenCalledWith(undefined)
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Content-Type',
+      'video/quicktime',
+    )
+  })
+
+  it('propagates errors from the service', async () => {
+    streamFootage.mockRejectedValueOnce(new Error('bucket unreachable'))
+
+    const res = createMockRes()
+    await expect(getFootage({ headers: {} }, res)).rejects.toThrow(
+      'bucket unreachable',
+    )
   })
 })

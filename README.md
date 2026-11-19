@@ -138,7 +138,7 @@ The dashboard is gated by the backend's shared admin token (see [Admin authentic
 
 ## Backend
 
-Express API handling community form submissions — validates incoming data, verifies reCAPTCHA and rate limits, uploads media to Dropbox, and stores submission records in Postgres. Also serves video assets from Railway bucket storage via presigned URLs, manages editable page content, and exposes admin-only endpoints protected by a bearer token.
+Express API handling community form submissions — validates incoming data, verifies reCAPTCHA and rate limits, uploads media to Dropbox, and stores submission records in Postgres. Also streams video assets from Railway bucket storage with HTTP range support (so videos can seek without downloading the whole file), manages editable page content, and exposes admin-only endpoints protected by a bearer token.
 
 ### Tech Stack
 
@@ -231,8 +231,8 @@ All endpoints are versioned under `/api/v1`.
 | GET    | `/api/v1/submissions/:id`      | Admin  | Get a single submission with its files       |
 | GET    | `/api/v1/content/:slug`        | Public | Get page content by slug                     |
 | PUT    | `/api/v1/content/:slug`        | Admin  | Update page content by slug                  |
-| GET    | `/api/v1/media/footage`        | Public | Redirect to a presigned video URL            |
-| GET    | `/api/v1/media/footage-mobile` | Public | Redirect to a presigned mobile video URL     |
+| GET    | `/api/v1/media/footage`        | Public | Stream the video (supports HTTP range/seek)  |
+| GET    | `/api/v1/media/footage-mobile` | Public | Stream the mobile video (supports range/seek) |
 
 GET requests return the requested resource. `POST` and `PUT` return only a status code (`201` / `204`) with no response body.
 

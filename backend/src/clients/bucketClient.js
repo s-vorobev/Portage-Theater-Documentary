@@ -1,8 +1,9 @@
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import {
+  S3Client,
+  GetObjectCommand,
+  HeadObjectCommand,
+} from '@aws-sdk/client-s3'
 import { env } from '../config/env.js'
-
-const PRESIGN_EXPIRES_IN_SECONDS = 3600
 
 const s3 = new S3Client({
   endpoint: env.BUCKET_ENDPOINT,
@@ -13,10 +14,15 @@ const s3 = new S3Client({
   },
 })
 
-export async function getPresignedUrl(key) {
-  return getSignedUrl(
-    s3,
-    new GetObjectCommand({ Bucket: env.BUCKET_NAME, Key: key }),
-    { expiresIn: PRESIGN_EXPIRES_IN_SECONDS },
-  )
+export async function getObjectHead(key) {
+  return s3.send(new HeadObjectCommand({ Bucket: env.BUCKET_NAME, Key: key }))
+}
+
+export async function getObjectBody(key, range) {
+  const command = new GetObjectCommand({
+    Bucket: env.BUCKET_NAME,
+    Key: key,
+    ...(range ? { Range: range } : {}),
+  })
+  return s3.send(command)
 }
