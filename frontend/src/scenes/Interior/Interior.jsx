@@ -59,7 +59,7 @@ function Interior() {
   return (
     <TheaterScene
       className="interior"
-      bgSrc="/inside_theater.png"
+      bgSrc="/inside_theater.webp"
       bgWidth={FRAME_WIDTH}
       bgHeight={FRAME_HEIGHT}
       overlay={
