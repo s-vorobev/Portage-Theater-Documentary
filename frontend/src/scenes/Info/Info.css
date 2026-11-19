@@ -21,7 +21,6 @@
   font-size: clamp(1rem, 0.9rem + 0.5vw, 1.35rem);
   line-height: 1.7;
   text-align: center;
-  white-space: pre-line;
 }
 
 .info-footer {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './Info.css'
 import { apiUrl, endpoints } from '../../lib/api'
+import { contentToHtml } from '../../lib/richText'
 
 const INFO_SLUG = 'main_info'
 
@@ -32,7 +33,11 @@ function Info() {
   return (
     <section id="info" className="page info">
       <div className="info-content">
-        <p className="info-text">{body}</p>
+        <div
+          className="info-text"
+          // Content is sanitized in contentToHtml; it's admin-authored rich text.
+          dangerouslySetInnerHTML={{ __html: contentToHtml(body) }}
+        />
       </div>
 
       <footer className="info-footer">
