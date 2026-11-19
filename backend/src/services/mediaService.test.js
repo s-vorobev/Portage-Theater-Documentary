@@ -5,6 +5,13 @@ vi.mock('../clients/bucketClient.js', () => ({
   getObjectBody: vi.fn(),
 }))
 
+vi.mock('../config/env.js', () => ({
+  env: {
+    BUCKET_FOOTAGE_KEY: 'footage.mp4',
+    BUCKET_FOOTAGE_MOBILE_KEY: 'footage_mobile.mov',
+  },
+}))
+
 const { streamFootage, streamFootageMobile } = await import('./mediaService.js')
 const { getObjectHead, getObjectBody } = await import('../clients/bucketClient.js')
 
@@ -58,13 +65,13 @@ describe('mediaService', () => {
     expect(result.body).toBeNull()
   })
 
-  it('falls back to a mapped content type when the object has none', async () => {
+  it('falls back to a generic content type when the object has none', async () => {
     getObjectHead.mockResolvedValueOnce({ ContentLength: 1000 })
     getObjectBody.mockResolvedValueOnce({ Body: 'stream' })
 
     const result = await streamFootage(undefined)
 
-    expect(result.contentType).toBe('video/mp4')
+    expect(result.contentType).toBe('application/octet-stream')
   })
 
   it('loads the mobile footage key', async () => {

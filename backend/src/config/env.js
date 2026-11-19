@@ -19,6 +19,8 @@ const envSchema = z.object({
   BUCKET_ACCESS_KEY: z.string().min(1),
   BUCKET_SECRET_KEY: z.string().min(1),
   BUCKET_NAME: z.string().min(1),
+  BUCKET_FOOTAGE_KEY: z.string().min(1).default('footage.mp4'),
+  BUCKET_FOOTAGE_MOBILE_KEY: z.string().min(1).default('footage_mobile.mov'),
 
   NODE_ENV: z
     .enum(['development', 'production', 'test'])

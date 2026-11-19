@@ -1,21 +1,18 @@
 import { getObjectHead, getObjectBody } from '../clients/bucketClient.js'
 import { parseRange } from '../utils/parseRange.js'
+import { env } from '../config/env.js'
+
+const FALLBACK_CONTENT_TYPE = 'application/octet-stream'
 
 const MEDIA_KEYS = {
-  footage: 'footage.mp4',
-  footageMobile: 'footage_mobile.mov',
-}
-
-const CONTENT_TYPES = {
-  'footage.mp4': 'video/mp4',
-  'footage_mobile.mov': 'video/quicktime',
+  footage: env.BUCKET_FOOTAGE_KEY,
+  footageMobile: env.BUCKET_FOOTAGE_MOBILE_KEY,
 }
 
 async function loadMedia(key, rangeHeader) {
   const head = await getObjectHead(key)
   const size = head.ContentLength ?? 0
-  const contentType =
-    head.ContentType || CONTENT_TYPES[key] || 'application/octet-stream'
+  const contentType = head.ContentType || FALLBACK_CONTENT_TYPE
 
   const range = parseRange(rangeHeader, size)
 
