@@ -1,6 +1,11 @@
 import 'dotenv/config'
 import { z } from 'zod'
 
+// Treats a blank value as "unset", so optional fields can be left empty in
+// .env without failing validation.
+const emptyToUndefined = (value) =>
+  typeof value === 'string' && value.trim() === '' ? undefined : value
+
 const envSchema = z.object({
   PORT: z.coerce.number().default(3001),
 
@@ -12,11 +17,14 @@ const envSchema = z.object({
   DROPBOX_APP_SECRET: z.string().min(1),
   DROPBOX_REFRESH_TOKEN: z.string().min(1),
   DROPBOX_UPLOAD_FOLDER: z.string().min(1).default('/dev'),
-  FRONTEND_URL: z.string().url().default('http://localhost:5173'),
-  ADMIN_URL: z.preprocess(
-    (value) => (value === '' ? undefined : value),
-    z.string().url().optional(),
+  // FRONTEND_URL / ADMIN_URL accept a bare domain ("example.com"), a scheme
+  // ("https://example.com"), or a full URL. The CORS layer expands each into
+  // its http/https + www/non-www variants, so the exact form doesn't matter.
+  FRONTEND_URL: z.preprocess(
+    emptyToUndefined,
+    z.string().default('http://localhost:5173'),
   ),
+  ADMIN_URL: z.preprocess(emptyToUndefined, z.string().optional()),
 
   BUCKET_ENDPOINT: z.string().min(1),
   BUCKET_REGION: z.string().default('auto'),
