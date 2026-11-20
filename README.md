@@ -183,6 +183,7 @@ DROPBOX_REFRESH_TOKEN=
 DROPBOX_UPLOAD_FOLDER=/dev
 
 FRONTEND_URL=http://localhost:5173
+ADMIN_URL=
 
 RECAPTCHA_SECRET_KEY=
 
@@ -205,6 +206,7 @@ BUCKET_NAME=
 | `DROPBOX_REFRESH_TOKEN` | **Yes**                                  | Obtained via a one-time OAuth authorization flow. Does not expire under normal use. See team docs for the exact steps if you need to generate a new one.                                                                                             |
 | `DROPBOX_UPLOAD_FOLDER` | No — defaults to `/dev`                  | Folder path in Dropbox where uploaded media is stored.                                                                                                                                                                                               |
 | `FRONTEND_URL`          | No — defaults to `http://localhost:5173` | Used for CORS — must match wherever the frontend is actually running, or browser requests to the API will be blocked.                                                                                                                                |
+| `ADMIN_URL`             | No                                     | Origin of the admin dashboard, also allowed for CORS. Set it to the admin app's deployed URL so the dashboard can call the API. Leave blank if you only run the public site.                                                                         |
 | `RECAPTCHA_SECRET_KEY`  | **Yes**                                  | Private reCAPTCHA v3 secret key from the [reCAPTCHA admin console](https://www.google.com/recaptcha/admin) (pairs with the frontend's `VITE_RECAPTCHA_SITE_KEY`). Never exposed to the browser — used server-side only to verify tokens with Google. |
 | `ADMIN_TOKEN`           | **Yes**                                  | Shared secret for the admin endpoints (see [Admin authentication](#admin-authentication)). Sent by clients as `Authorization: Bearer <token>`. Must be at least 16 characters — generate one with `openssl rand -hex 32`.                            |
 | `BUCKET_ENDPOINT`       | **Yes**                                  | S3-compatible endpoint URL for the Railway bucket. Use the value as given in Railway's bucket credentials — it already includes the `https://` scheme, don't prepend it again.                                                                       |
@@ -215,7 +217,7 @@ BUCKET_NAME=
 | `BUCKET_FOOTAGE_KEY`    | No — defaults to `footage.mp4`           | Object key in the bucket for the desktop footage video. Change this instead of editing code if the file is renamed.                                                                                                                                   |
 | `BUCKET_FOOTAGE_MOBILE_KEY` | No — defaults to `footage_mobile.mov` | Object key in the bucket for the mobile footage video. Change this instead of editing code if the file is renamed.                                                                                                                                    |
 
-`FRONTEND_URL` controls CORS. In `development`, any `http://localhost:<port>` origin is also allowed, so the public frontend and the admin dashboard can both call the API locally without changing the config.
+`FRONTEND_URL` and `ADMIN_URL` control CORS — the browser must send a request whose origin matches one of them, or the API rejects it. In `development`, any `http://localhost:<port>` origin is also allowed, so the public frontend and the admin dashboard can both call the API locally without changing the config.
 
 Run `sql/schema.sql` once against a fresh Postgres database before the API can store anything — it's not run automatically. Easiest via Railway's Postgres service → Data/query console → paste and execute the file's contents. It creates the `submissions`, `submission_files`, and `content` tables.
 
