@@ -1,6 +1,6 @@
 import { timingSafeEqual } from 'crypto'
 import { env } from '../config/env.js'
-import { HttpError } from '../utils/httpError.js'
+import { HttpError } from '../utils/HttpError.js'
 
 const BEARER_PREFIX = 'Bearer '
 

@@ -1,4 +1,4 @@
-import { HttpError } from '../utils/httpError.js'
+import { HttpError } from '../utils/HttpError.js'
 import {
   getContent as findContent,
   updateContent as persistContent,

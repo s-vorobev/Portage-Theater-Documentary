@@ -1,5 +1,5 @@
 import { generateFilename } from '../utils/generateFilename.js'
-import { HttpError } from '../utils/httpError.js'
+import { HttpError } from '../utils/HttpError.js'
 import { verifyRecaptcha } from './recaptchaService.js'
 import { isWithinRateLimit } from './rateLimitService.js'
 import {
