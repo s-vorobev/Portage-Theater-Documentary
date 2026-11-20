@@ -84,6 +84,18 @@ function Footage({ className, style }) {
       events.forEach((event) => window.removeEventListener(event, onInteract))
   }, [shouldLoad, muted])
 
+  // Stop playback and release the stream when the component unmounts, so the
+  // video doesn't keep playing (and downloading) after leaving the page.
+  useEffect(() => {
+    const video = videoRef.current
+    return () => {
+      if (!video) return
+      video.pause()
+      video.removeAttribute('src')
+      video.load()
+    }
+  }, [])
+
   const toggleMute = () => setMuted((m) => !m)
 
   return (
