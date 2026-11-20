@@ -1,75 +1,135 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import {
+  TextStyle,
+  Color,
+  FontFamily,
+  FontSize,
+} from '@tiptap/extension-text-style'
+import { HexColorPicker, HexColorInput } from 'react-colorful'
 import { apiFetch, endpoints } from '../lib/api'
 import './ContentPanel.css'
 
 const CONTENT_SLUG = 'main_info'
 
-const FONT_SIZES = [
-  { label: 'Small', value: '0.85rem' },
-  { label: 'Normal', value: '1rem' },
-  { label: 'Large', value: '1.25rem' },
-  { label: 'X-Large', value: '1.6rem' },
-  { label: 'XX-Large', value: '2rem' },
+const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 36, 48, 72]
+
+const FONT_FAMILIES = [
+  { label: 'Bebas Neue', value: "'Bebas Neue', sans-serif" },
+  { label: 'Georgia', value: 'Georgia, serif' },
+  { label: 'Times New Roman', value: "'Times New Roman', serif" },
+  { label: 'Arial', value: 'Arial, sans-serif' },
+  { label: 'Helvetica', value: 'Helvetica, sans-serif' },
+  { label: 'Trebuchet MS', value: "'Trebuchet MS', sans-serif" },
+  { label: 'Courier New', value: "'Courier New', monospace" },
 ]
 
+const PRESET_COLORS = [
+  '#ffffff',
+  '#000000',
+  '#a61b36',
+  '#b23a3a',
+  '#ffe08a',
+  '#d9d9d9',
+  '#999999',
+]
+
+const HEX_RE = /^#([0-9a-f]{6})$/i
+
 function ContentPanel({ token, onUnauthorized }) {
-  const [body, setBody] = useState('')
-  const [savedBody, setSavedBody] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
   const [error, setError] = useState('')
   const [status, setStatus] = useState('')
   const [showSizes, setShowSizes] = useState(false)
+  const [showFonts, setShowFonts] = useState(false)
+  const [showColor, setShowColor] = useState(false)
+  const [color, setColor] = useState('#ffffff')
 
-  const editorRef = useRef(null)
-  const pendingHydrateRef = useRef(false)
+  const colorControlRef = useRef(null)
 
+  const editor = useEditor({
+    extensions: [StarterKit, TextStyle, Color, FontFamily, FontSize],
+    content: '',
+    onUpdate: () => setIsDirty(true),
+  })
+
+  // Fetch the stored content. Pure async — returns a result object so callers
+  // can handle the outcome (and setState) from their own async callbacks.
   const loadContent = useCallback(async () => {
     try {
       const response = await apiFetch(endpoints.content(CONTENT_SLUG), token)
       const data = await response.json()
-      const nextBody = data.body ?? ''
-      setBody(nextBody)
-      setSavedBody(nextBody)
-      pendingHydrateRef.current = true
-      setError('')
-      setStatus('')
+      return { body: data.body ?? '' }
     } catch (err) {
-      if (err.status === 401) {
+      if (err.status === 401) return { unauthorized: true }
+      return { error: true }
+    }
+  }, [token])
+
+  const handleLoadResult = useCallback(
+    (result) => {
+      if (result.unauthorized) {
         onUnauthorized()
         return
       }
-      setError('Could not load content.')
-    } finally {
+      if (result.error) {
+        setError('Could not load content.')
+        setIsLoading(false)
+        return
+      }
+      // emitUpdate: false so loading doesn't mark the document as dirty.
+      editor?.commands.setContent(result.body, { emitUpdate: false })
+      setIsDirty(false)
+      setError('')
+      setStatus('')
       setIsLoading(false)
+    },
+    [editor, onUnauthorized],
+  )
+
+  useEffect(() => {
+    if (!editor) return
+    let isActive = true
+    loadContent().then((result) => {
+      if (isActive) handleLoadResult(result)
+    })
+    return () => {
+      isActive = false
     }
-  }, [token, onUnauthorized])
+  }, [editor, loadContent, handleLoadResult])
 
+  // Close the color popover when the user clicks anywhere outside it.
   useEffect(() => {
-    const id = setTimeout(loadContent, 0)
-    return () => clearTimeout(id)
-  }, [loadContent])
-
-  // Put the loaded content into the editor DOM once, without clobbering the
-  // user's typing on subsequent renders.
-  useEffect(() => {
-    if (isLoading || !pendingHydrateRef.current || !editorRef.current) return
-    editorRef.current.innerHTML = body
-    pendingHydrateRef.current = false
-  }, [isLoading, body])
+    if (!showColor) return
+    const onDown = (e) => {
+      if (
+        colorControlRef.current &&
+        !colorControlRef.current.contains(e.target)
+      ) {
+        setShowColor(false)
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [showColor])
 
   async function handleSave() {
+    if (!editor) return
     setIsSaving(true)
     setError('')
     setStatus('')
 
     try {
+      const html = editor.getHTML()
       await apiFetch(endpoints.content(CONTENT_SLUG), token, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body }),
+        body: JSON.stringify({ body: html }),
       })
-      setSavedBody(body)
+      setIsDirty(false)
       setStatus('Saved.')
     } catch (err) {
       if (err.status === 401) {
@@ -83,49 +143,36 @@ function ContentPanel({ token, onUnauthorized }) {
   }
 
   function handleReset() {
-    setIsLoading(true)
     setError('')
     setStatus('')
-    loadContent()
+    setIsLoading(true)
+    loadContent().then(handleLoadResult)
   }
 
-  function handleInput() {
-    setBody(editorRef.current.innerHTML)
-  }
-
-  function runCommand(command) {
-    document.execCommand(command, false, null)
-    handleInput()
-  }
-
-  function applyFontSize(size) {
-    const selection = window.getSelection()
-    if (!selection || selection.rangeCount === 0) return
-    const range = selection.getRangeAt(0)
-    if (range.collapsed) return
-
-    const span = document.createElement('span')
-    span.style.fontSize = size
-
-    try {
-      range.surroundContents(span)
-    } catch {
-      const fragment = range.extractContents()
-      span.appendChild(fragment)
-      range.insertNode(span)
+  // Apply a style command to the current selection, or to the whole document
+  // when nothing is selected.
+  function applyStyle(build) {
+    if (!editor) return
+    const chain = editor.chain().focus()
+    if (editor.state.selection.empty) {
+      chain.selectAll()
     }
-
-    selection.removeAllRanges()
-    handleInput()
+    build(chain).run()
   }
 
-  function handlePaste(event) {
-    event.preventDefault()
-    const text = event.clipboardData.getData('text/plain')
-    document.execCommand('insertText', false, text)
+  function handleColorChange(nextColor) {
+    if (!HEX_RE.test(nextColor)) return
+    setColor(nextColor)
+    if (!editor) return
+    // No .focus() here: the picker owns focus while dragging/typing, so we
+    // apply directly to the editor's current selection state.
+    const chain = editor.chain()
+    if (editor.state.selection.empty) {
+      chain.selectAll()
+    }
+    chain.setColor(nextColor).run()
   }
 
-  const isDirty = body !== savedBody
   const isBusy = isLoading || isSaving
 
   return (
@@ -141,10 +188,9 @@ function ContentPanel({ token, onUnauthorized }) {
         <button
           type="button"
           className="content-toolbar-button content-toolbar-bold"
-          onMouseDown={(e) => {
-            e.preventDefault()
-            runCommand('bold')
-          }}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => editor?.chain().focus().toggleBold().run()}
+          disabled={!editor}
           aria-label="Bold"
           title="Bold"
         >
@@ -153,10 +199,9 @@ function ContentPanel({ token, onUnauthorized }) {
         <button
           type="button"
           className="content-toolbar-button content-toolbar-italic"
-          onMouseDown={(e) => {
-            e.preventDefault()
-            runCommand('italic')
-          }}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => editor?.chain().focus().toggleItalic().run()}
+          disabled={!editor}
           aria-label="Italic"
           title="Italic"
         >
@@ -165,10 +210,9 @@ function ContentPanel({ token, onUnauthorized }) {
         <button
           type="button"
           className="content-toolbar-button content-toolbar-underline"
-          onMouseDown={(e) => {
-            e.preventDefault()
-            runCommand('underline')
-          }}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => editor?.chain().focus().toggleUnderline().run()}
+          disabled={!editor}
           aria-label="Underline"
           title="Underline"
         >
@@ -182,7 +226,9 @@ function ContentPanel({ token, onUnauthorized }) {
             onMouseDown={(e) => {
               e.preventDefault()
               setShowSizes((s) => !s)
+              setShowFonts(false)
             }}
+            disabled={!editor}
             aria-label="Font size"
             title="Font size"
           >
@@ -192,38 +238,111 @@ function ContentPanel({ token, onUnauthorized }) {
             <div className="content-size-menu" role="menu">
               {FONT_SIZES.map((size) => (
                 <button
-                  key={size.value}
+                  key={size}
                   type="button"
                   role="menuitem"
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    applyFontSize(size.value)
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    applyStyle((chain) => chain.setFontSize(`${size}pt`))
                     setShowSizes(false)
                   }}
                 >
-                  {size.label}
+                  {size} pt
                 </button>
               ))}
             </div>
           )}
         </div>
+
+        <div className="content-font-control">
+          <button
+            type="button"
+            className="content-toolbar-button"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              setShowFonts((s) => !s)
+              setShowSizes(false)
+            }}
+            disabled={!editor}
+            aria-label="Font"
+            title="Font"
+          >
+            Font
+          </button>
+          {showFonts && (
+            <div className="content-font-menu" role="menu">
+              {FONT_FAMILIES.map((font) => (
+                <button
+                  key={font.value}
+                  type="button"
+                  role="menuitem"
+                  style={{ fontFamily: font.value }}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    applyStyle((chain) => chain.setFontFamily(font.value))
+                    setShowFonts(false)
+                  }}
+                >
+                  {font.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="content-color-control" ref={colorControlRef}>
+          <button
+            type="button"
+            className="content-toolbar-button"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              setShowColor((s) => !s)
+            }}
+            disabled={!editor}
+            aria-label="Text color"
+            title="Text color"
+          >
+            <span
+              className="content-color-swatch"
+              style={{ backgroundColor: color }}
+            />
+          </button>
+
+          {showColor && (
+            <div className="content-color-popover">
+              <HexColorPicker color={color} onChange={handleColorChange} />
+              <HexColorInput
+                color={color}
+                onChange={handleColorChange}
+                prefixed
+              />
+              <div className="content-color-presets">
+                {PRESET_COLORS.map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    className="content-color-preset"
+                    style={{ backgroundColor: preset }}
+                    aria-label={`Color ${preset}`}
+                    title={preset}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => handleColorChange(preset)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div
-        ref={editorRef}
-        className="content-editor"
-        contentEditable={!isBusy}
-        suppressContentEditableWarning
-        onInput={handleInput}
-        onPaste={handlePaste}
-      />
+      <EditorContent editor={editor} className="content-editor" />
 
       <div className="content-actions">
         <button
           type="button"
           className="content-button content-button-primary"
           onClick={handleSave}
-          disabled={isBusy || !isDirty}
+          disabled={isBusy || !isDirty || !editor}
         >
           {isSaving ? 'Saving…' : 'Save'}
         </button>
@@ -231,7 +350,7 @@ function ContentPanel({ token, onUnauthorized }) {
           type="button"
           className="content-button"
           onClick={handleReset}
-          disabled={isBusy}
+          disabled={isBusy || !editor}
         >
           Reset
         </button>

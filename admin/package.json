@@ -14,7 +14,12 @@
     "audit": "npm audit --audit-level=high"
   },
   "dependencies": {
+    "@tiptap/extension-text-style": "^3.34.0",
+    "@tiptap/pm": "^3.34.0",
+    "@tiptap/react": "^3.34.0",
+    "@tiptap/starter-kit": "^3.34.0",
     "react": "^19.2.8",
+    "react-colorful": "^5.8.1",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
