@@ -1,3 +1,18 @@
+/* Red glow in the four corners, fading to black at the middle of the
+   sides and the center. Scoped to the exterior scene only. */
+.exterior::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(178, 58, 58, 0.02)),
+    radial-gradient(circle at 100% 0%, rgba(178, 58, 58, 0.02)),
+    radial-gradient(circle at 0% 100%, rgba(178, 58, 58, 0.02)),
+    radial-gradient(circle at 100% 100%, rgba(178, 58, 58, 0.02));
+  z-index: 1;
+}
+
 .mobile-title-wrapper {
   position: absolute;
   left: 50%;

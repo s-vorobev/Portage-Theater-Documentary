@@ -4,14 +4,34 @@
   align-items: center;
   justify-content: center;
   padding: 4rem 1.5rem 10rem;
+  background: radial-gradient(
+    ellipse at center,
+    #0d0608 0%,
+    var(--color-bg) 72%
+  );
 }
 
 .info-content {
+  position: relative;
+  isolation: isolate;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+}
+
+.info-content::before {
+  content: '';
+  position: absolute;
+  inset: -15%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(178, 58, 58, 0.06),
+    transparent 65%
+  );
+  z-index: -1;
+  pointer-events: none;
 }
 
 .info-text {
