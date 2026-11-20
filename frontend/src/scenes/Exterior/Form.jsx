@@ -120,7 +120,11 @@ function Form({ isOpen, onClose }) {
 
   return (
     <div className="form-overlay" onClick={onClose}>
-      <div className="form-container" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="form-container"
+        data-lenis-prevent
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           className="form-close"
           onClick={onClose}

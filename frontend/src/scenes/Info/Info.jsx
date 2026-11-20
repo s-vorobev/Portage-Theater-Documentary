@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
+import { motion, useTransform } from 'motion/react'
 import './Info.css'
 import { apiUrl, endpoints } from '../../lib/api'
 import { contentToHtml } from '../../lib/richText'
+import { RISE } from '../../lib/animation'
+import Footer from '../../components/Footer'
 
 const INFO_SLUG = 'main_info'
 
-function Info() {
+function Info({ reveal }) {
   const [body, setBody] = useState('')
+
+  const contentY = useTransform(reveal, [0, 1], [RISE.infoText, 0])
 
   useEffect(() => {
     let isActive = true
@@ -32,23 +37,18 @@ function Info() {
 
   return (
     <section id="info" className="page info">
-      <div className="info-content">
+      <motion.div
+        className="info-content"
+        style={{ y: contentY, opacity: reveal }}
+      >
         <div
           className="info-text"
           // Content is sanitized in contentToHtml; it's admin-authored rich text.
           dangerouslySetInnerHTML={{ __html: contentToHtml(body) }}
         />
-      </div>
+      </motion.div>
 
-      <footer className="info-footer">
-        <div className="info-footer-brand" />
-
-        <div className="info-footer-links">
-          <div className="info-footer-column" />
-          <div className="info-footer-column" />
-          <div className="info-footer-column" />
-        </div>
-      </footer>
+      <Footer reveal={reveal} />
     </section>
   )
 }
