@@ -5,6 +5,7 @@ import cors from 'cors'
 import multer from 'multer'
 import { env } from './config/env.js'
 import { FALLBACK_EMAIL } from './config/constants.js'
+import { expandOrigins } from './config/origins.js'
 import submissionRoutes from './routes/submissionRoutes.js'
 import mediaRoutes from './routes/mediaRoutes.js'
 import contentRoutes from './routes/contentRoutes.js'
@@ -18,8 +19,11 @@ app.set('trust proxy', true)
 const LOCAL_ORIGIN = /^http:\/\/localhost:\d+$/
 
 // Origins allowed to call the API from the browser. FRONTEND_URL is the
-// public site; ADMIN_URL is the admin dashboard (optional).
-const ALLOWED_ORIGINS = [env.FRONTEND_URL, env.ADMIN_URL].filter(Boolean)
+// public site; ADMIN_URL is the admin dashboard (optional). Each is expanded
+// into its http/https + www/non-www variants.
+const ALLOWED_ORIGINS = expandOrigins(
+  [env.FRONTEND_URL, env.ADMIN_URL].filter(Boolean),
+)
 
 app.use(
   cors({
