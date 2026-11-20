@@ -69,7 +69,7 @@ function Exterior() {
           style={{
             fontFamily: "'Bebas Neue', sans-serif",
             fontSize: '150px',
-            fill: 'white',
+            fill: 'var(--color-text)',
             letterSpacing: '10px',
           }}
         >

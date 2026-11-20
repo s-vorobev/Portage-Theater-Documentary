@@ -21,6 +21,13 @@ CREATE TABLE IF NOT EXISTS submission_files (
   file_size_bytes     BIGINT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS content (
+  content_id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug         TEXT NOT NULL UNIQUE,
+  body         TEXT NOT NULL,
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE INDEX IF NOT EXISTS idx_submission_files_submission_id
   ON submission_files(submission_id);
 

@@ -7,6 +7,8 @@ vi.mock('../clients/dropboxClient.js', () => ({
 
 vi.mock('../repositories/submissionRepository.js', () => ({
   insertSubmissionWithFiles: vi.fn(),
+  getSubmissionIds: vi.fn(),
+  getSubmissionWithFiles: vi.fn(),
 }))
 
 vi.mock('./recaptchaService.js', () => ({
@@ -17,9 +19,17 @@ vi.mock('./rateLimitService.js', () => ({
   isWithinRateLimit: vi.fn(),
 }))
 
-import { createSubmission } from './submissionService.js'
+import {
+  createSubmission,
+  listSubmissionIds,
+  getSubmissionById,
+} from './submissionService.js'
 import { uploadFile, deleteFile } from '../clients/dropboxClient.js'
-import { insertSubmissionWithFiles } from '../repositories/submissionRepository.js'
+import {
+  insertSubmissionWithFiles,
+  getSubmissionIds,
+  getSubmissionWithFiles,
+} from '../repositories/submissionRepository.js'
 import { verifyRecaptcha } from './recaptchaService.js'
 import { isWithinRateLimit } from './rateLimitService.js'
 
@@ -43,6 +53,16 @@ function makeFile(overrides = {}) {
   }
 }
 
+function callCreateSubmission(overrides = {}) {
+  return createSubmission({
+    form: validData,
+    files: [],
+    ipAddress: '127.0.0.1',
+    recaptchaToken: VALID_TOKEN,
+    ...overrides,
+  })
+}
+
 describe('createSubmission', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -54,7 +74,7 @@ describe('createSubmission', () => {
     const badFile = makeFile({ mimetype: 'application/zip' })
 
     await expect(
-      createSubmission(validData, [badFile], '127.0.0.1', VALID_TOKEN),
+      callCreateSubmission({ files: [badFile] }),
     ).rejects.toMatchObject({ status: 400 })
 
     expect(uploadFile).not.toHaveBeenCalled()
@@ -64,7 +84,7 @@ describe('createSubmission', () => {
     const hugeFile = makeFile({ size: 3.5 * 1024 * 1024 * 1024 })
 
     await expect(
-      createSubmission(validData, [hugeFile], '127.0.0.1', VALID_TOKEN),
+      callCreateSubmission({ files: [hugeFile] }),
     ).rejects.toMatchObject({ status: 400 })
 
     expect(uploadFile).not.toHaveBeenCalled()
@@ -74,7 +94,7 @@ describe('createSubmission', () => {
     isWithinRateLimit.mockResolvedValueOnce(false)
 
     await expect(
-      createSubmission(validData, [makeFile()], '127.0.0.1', VALID_TOKEN),
+      callCreateSubmission({ files: [makeFile()] }),
     ).rejects.toMatchObject({
       status: 429,
       message: expect.stringContaining('footage@portagetheaterdocumentary.com'),
@@ -86,7 +106,10 @@ describe('createSubmission', () => {
 
   it('rejects when no recaptcha token is provided', async () => {
     await expect(
-      createSubmission(validData, [makeFile()], '127.0.0.1', undefined),
+      callCreateSubmission({
+        files: [makeFile()],
+        recaptchaToken: undefined,
+      }),
     ).rejects.toMatchObject({ status: 400 })
 
     expect(uploadFile).not.toHaveBeenCalled()
@@ -100,7 +123,7 @@ describe('createSubmission', () => {
     })
 
     await expect(
-      createSubmission(validData, [makeFile()], '127.0.0.1', VALID_TOKEN),
+      callCreateSubmission({ files: [makeFile()] }),
     ).rejects.toMatchObject({ status: 400 })
 
     expect(uploadFile).not.toHaveBeenCalled()
@@ -111,12 +134,7 @@ describe('createSubmission', () => {
     insertSubmissionWithFiles.mockResolvedValue('new-submission-id')
 
     const file = makeFile()
-    const result = await createSubmission(
-      validData,
-      [file],
-      '127.0.0.1',
-      VALID_TOKEN,
-    )
+    const result = await callCreateSubmission({ files: [file] })
 
     expect(isWithinRateLimit).toHaveBeenCalledWith('127.0.0.1')
     expect(verifyRecaptcha).toHaveBeenCalledWith(VALID_TOKEN)
@@ -129,7 +147,10 @@ describe('createSubmission', () => {
     uploadFile.mockResolvedValue('/submissions/x.jpg')
     insertSubmissionWithFiles.mockResolvedValue('id-123')
 
-    await createSubmission(validData, [makeFile()], '10.0.0.1', VALID_TOKEN)
+    await callCreateSubmission({
+      files: [makeFile()],
+      ipAddress: '10.0.0.1',
+    })
 
     const [submissionArg] = insertSubmissionWithFiles.mock.calls[0]
     expect(submissionArg.firstName).toBe('Sergei')
@@ -143,12 +164,11 @@ describe('createSubmission', () => {
     insertSubmissionWithFiles.mockResolvedValue('id-123')
 
     const { phone, ...dataWithoutPhone } = validData
-    await createSubmission(
-      dataWithoutPhone,
-      [makeFile()],
-      '10.0.0.1',
-      VALID_TOKEN,
-    )
+    await callCreateSubmission({
+      form: dataWithoutPhone,
+      files: [makeFile()],
+      ipAddress: '10.0.0.1',
+    })
 
     const [submissionArg] = insertSubmissionWithFiles.mock.calls[0]
     expect(submissionArg.phone).toBeNull()
@@ -164,9 +184,9 @@ describe('createSubmission', () => {
       makeFile({ originalname: 'second.jpg' }),
     ]
 
-    await expect(
-      createSubmission(validData, files, '127.0.0.1', VALID_TOKEN),
-    ).rejects.toMatchObject({ status: 502 })
+    await expect(callCreateSubmission({ files })).rejects.toMatchObject({
+      status: 502,
+    })
 
     expect(deleteFile).toHaveBeenCalledTimes(1)
     expect(deleteFile).toHaveBeenCalledWith('/submissions/first.jpg')
@@ -178,7 +198,7 @@ describe('createSubmission', () => {
     insertSubmissionWithFiles.mockRejectedValue(new Error('db error'))
 
     await expect(
-      createSubmission(validData, [makeFile()], '127.0.0.1', VALID_TOKEN),
+      callCreateSubmission({ files: [makeFile()] }),
     ).rejects.toMatchObject({ status: 500 })
 
     expect(deleteFile).toHaveBeenCalledWith('/submissions/uploaded.jpg')
@@ -187,15 +207,41 @@ describe('createSubmission', () => {
   it('handles a submission with no files at all', async () => {
     insertSubmissionWithFiles.mockResolvedValue('id-no-files')
 
-    const result = await createSubmission(
-      validData,
-      [],
-      '127.0.0.1',
-      VALID_TOKEN,
-    )
+    const result = await callCreateSubmission({ files: [] })
 
     expect(uploadFile).not.toHaveBeenCalled()
     expect(insertSubmissionWithFiles).toHaveBeenCalledTimes(1)
     expect(result).toBe('id-no-files')
+  })
+})
+
+describe('listSubmissionIds', () => {
+  it('delegates to the repository and returns the ids', async () => {
+    getSubmissionIds.mockResolvedValueOnce(['a', 'b'])
+
+    const result = await listSubmissionIds(10, 20)
+
+    expect(getSubmissionIds).toHaveBeenCalledWith(10, 20)
+    expect(result).toEqual(['a', 'b'])
+  })
+})
+
+describe('getSubmissionById', () => {
+  it('returns the submission when found', async () => {
+    const submission = { firstName: 'Sergei', files: [] }
+    getSubmissionWithFiles.mockResolvedValueOnce(submission)
+
+    const result = await getSubmissionById('id-1')
+
+    expect(getSubmissionWithFiles).toHaveBeenCalledWith('id-1')
+    expect(result).toBe(submission)
+  })
+
+  it('throws a 404 when the submission does not exist', async () => {
+    getSubmissionWithFiles.mockResolvedValueOnce(null)
+
+    await expect(getSubmissionById('missing')).rejects.toMatchObject({
+      status: 404,
+    })
   })
 })

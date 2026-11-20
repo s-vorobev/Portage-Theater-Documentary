@@ -7,15 +7,31 @@ import { env } from './config/env.js'
 import { FALLBACK_EMAIL } from './config/constants.js'
 import submissionRoutes from './routes/submissionRoutes.js'
 import mediaRoutes from './routes/mediaRoutes.js'
+import contentRoutes from './routes/contentRoutes.js'
 
 export const app = express()
 
+const API_PREFIX = '/api/v1'
+
 app.set('trust proxy', true)
 
-app.use(cors({ origin: env.FRONTEND_URL }))
+const LOCAL_ORIGIN = /^http:\/\/localhost:\d+$/
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      const allowed =
+        !origin ||
+        origin === env.FRONTEND_URL ||
+        (env.NODE_ENV === 'development' && LOCAL_ORIGIN.test(origin))
+      callback(null, allowed)
+    },
+  }),
+)
 app.use(express.json())
-app.use('/api', submissionRoutes)
-app.use(mediaRoutes)
+app.use(API_PREFIX, submissionRoutes)
+app.use(API_PREFIX, mediaRoutes)
+app.use(API_PREFIX, contentRoutes)
 
 const MULTER_ERROR_MESSAGES = {
   LIMIT_FILE_SIZE: `One of your files is too large. You can email your submission to ${FALLBACK_EMAIL} instead.`,

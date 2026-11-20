@@ -1,22 +1,37 @@
-import { getPresignedUrl } from '../clients/bucketClient.js'
+import * as mediaService from '../services/mediaService.js'
 
-const MEDIA_KEYS = {
-  footage: 'footage.mp4',
-  footageMobile: 'footage_mobile.mov',
-}
+async function streamResponse(req, res, loadMedia) {
+  const { size, contentType, range, body } = await loadMedia(req.headers.range)
 
-async function redirectToMedia(res, key) {
-  try {
-    const url = await getPresignedUrl(key)
-    res.redirect(url)
-  } catch (err) {
-    console.error(`Bucket presign error for key "${key}":`, err)
-    res.status(500).send('Could not load media')
+  res.setHeader('Accept-Ranges', 'bytes')
+  res.setHeader('Content-Type', contentType)
+
+  if (range.type === 'none') {
+    res.status(200)
+    res.setHeader('Content-Length', size)
+  } else if (range.type === 'unsatisfiable') {
+    res.status(416)
+    res.setHeader('Content-Range', `bytes */${size}`)
+    res.end()
+    return
+  } else {
+    res.status(206)
+    res.setHeader('Content-Range', `bytes ${range.start}-${range.end}/${size}`)
+    res.setHeader('Content-Length', range.end - range.start + 1)
   }
+
+  body.on('error', (err) => {
+    console.error('Error streaming media:', err)
+    res.destroy()
+  })
+
+  body.pipe(res)
 }
 
-export const getFootage = (_req, res) =>
-  redirectToMedia(res, MEDIA_KEYS.footage)
+export async function getFootage(req, res) {
+  await streamResponse(req, res, mediaService.streamFootage)
+}
 
-export const getFootageMobile = (_req, res) =>
-  redirectToMedia(res, MEDIA_KEYS.footageMobile)
+export async function getFootageMobile(req, res) {
+  await streamResponse(req, res, mediaService.streamFootageMobile)
+}

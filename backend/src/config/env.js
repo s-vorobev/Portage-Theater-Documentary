@@ -7,6 +7,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
 
   RECAPTCHA_SECRET_KEY: z.string().min(1),
+  ADMIN_TOKEN: z.string().min(16),
   DROPBOX_APP_KEY: z.string().min(1),
   DROPBOX_APP_SECRET: z.string().min(1),
   DROPBOX_REFRESH_TOKEN: z.string().min(1),
@@ -18,6 +19,8 @@ const envSchema = z.object({
   BUCKET_ACCESS_KEY: z.string().min(1),
   BUCKET_SECRET_KEY: z.string().min(1),
   BUCKET_NAME: z.string().min(1),
+  BUCKET_FOOTAGE_KEY: z.string().min(1).default('footage.mp4'),
+  BUCKET_FOOTAGE_MOBILE_KEY: z.string().min(1).default('footage_mobile.mov'),
 
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
