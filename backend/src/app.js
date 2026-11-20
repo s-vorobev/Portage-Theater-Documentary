@@ -17,12 +17,16 @@ app.set('trust proxy', true)
 
 const LOCAL_ORIGIN = /^http:\/\/localhost:\d+$/
 
+// Origins allowed to call the API from the browser. FRONTEND_URL is the
+// public site; ADMIN_URL is the admin dashboard (optional).
+const ALLOWED_ORIGINS = [env.FRONTEND_URL, env.ADMIN_URL].filter(Boolean)
+
 app.use(
   cors({
     origin(origin, callback) {
       const allowed =
         !origin ||
-        origin === env.FRONTEND_URL ||
+        ALLOWED_ORIGINS.includes(origin) ||
         (env.NODE_ENV === 'development' && LOCAL_ORIGIN.test(origin))
       callback(null, allowed)
     },

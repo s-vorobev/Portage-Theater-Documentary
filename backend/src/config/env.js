@@ -13,6 +13,10 @@ const envSchema = z.object({
   DROPBOX_REFRESH_TOKEN: z.string().min(1),
   DROPBOX_UPLOAD_FOLDER: z.string().min(1).default('/dev'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
+  ADMIN_URL: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.string().url().optional(),
+  ),
 
   BUCKET_ENDPOINT: z.string().min(1),
   BUCKET_REGION: z.string().default('auto'),
