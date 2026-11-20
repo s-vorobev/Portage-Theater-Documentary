@@ -26,9 +26,9 @@ const SOCIAL_LINKS = [
 ]
 
 const PARTNER_LOGOS = [
-  { src: '/logos/azw.png', alt: 'AZW' },
-  { src: '/logos/zmg.png', alt: 'ZMG' },
-  { src: '/logos/4d-model.png', alt: '4D Model' },
+  { src: '/logos/zmg.webp', alt: 'ZMG', className: 'footer-partner--zmg' },
+  { src: '/logos/4d_model.webp', alt: '4D Model', className: 'footer-partner--4d' },
+  { src: '/logos/azw.webp', alt: 'AZW', className: 'footer-partner--azw' },
 ]
 
 function Footer({ reveal }) {
@@ -36,40 +36,48 @@ function Footer({ reveal }) {
 
   return (
     <motion.footer className="footer" style={{ y, opacity: reveal }}>
-      <div className="footer-social">
-        {SOCIAL_LINKS.map((link) => (
-          <a
-            key={link.name}
-            className="footer-social-link"
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={link.name}
-            title={link.name}
-          >
-            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <title>{link.name}</title>
-              <path d={link.path} fill="currentColor" />
-            </svg>
-          </a>
-        ))}
-      </div>
+      <div className="footer-main">
+        <div className="footer-partners">
+          {PARTNER_LOGOS.map((logo) => (
+            <img
+              key={logo.src}
+              className={`footer-partner ${logo.className}`}
+              src={logo.src}
+              alt={logo.alt}
+            />
+          ))}
+        </div>
 
-      <img
-        className="footer-brand"
-        src="/logos/ptf-neon.png"
-        alt="Portage Theater Documentary"
-      />
-
-      <div className="footer-partners">
-        {PARTNER_LOGOS.map((logo) => (
+        <div className="footer-center">
           <img
-            key={logo.src}
-            className="footer-partner"
-            src={logo.src}
-            alt={logo.alt}
+            className="footer-brand"
+            src="/logos/portage_neon.webp"
+            alt="Portage Theater Documentary"
           />
-        ))}
+          <p className="footer-copyright">
+            © {new Date().getFullYear()} Portage Theater Documentary. All rights
+            reserved.
+          </p>
+        </div>
+
+        <div className="footer-social">
+          {SOCIAL_LINKS.map((link) => (
+            <a
+              key={link.name}
+              className="footer-social-link"
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={link.name}
+              title={link.name}
+            >
+              <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <title>{link.name}</title>
+                <path d={link.path} fill="currentColor" />
+              </svg>
+            </a>
+          ))}
+        </div>
       </div>
     </motion.footer>
   )
