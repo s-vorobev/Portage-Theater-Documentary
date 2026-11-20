@@ -42,6 +42,9 @@ React front end application for the Portage Theater Documentary website. Built w
 
 - **React** — UI component library
 - **Vite** — build tool and dev server with HMR
+- **Lenis** — smooth scrolling with programmatic page snapping
+- **Motion** (`motion/react`) — scroll-linked animations and transitions
+- **DOMPurify** — sanitizes admin-authored rich text before it's rendered
 - **ESLint** — code quality checks enforced on every PR
 - **Vitest** — unit testing
 - **reCAPTCHA v3** — invisible bot protection on the submission form
@@ -70,7 +73,9 @@ VITE_RECAPTCHA_SITE_KEY=
 
 reCAPTCHA v3 runs invisibly — there's no checkbox widget. A token is generated fresh at submit time and sent to the backend, which verifies it with Google and decides whether to accept the submission based on the returned score.
 
-The main page also has a scroll-snapped info section directly below the theater exterior. Its copy is fetched at runtime from `GET /api/v1/content/main_info`, so it can be edited from the admin dashboard without a redeploy.
+The home page (`/`) layers the theater exterior over a scroll-linked info section. Lenis provides smooth scrolling and snaps to the nearest full page when the visitor stops, while Motion drives a cinematic focus-pull: the exterior photo zooms in, blurs, and darkens as the info section fades in. The info copy is admin-authored rich text (HTML) fetched at runtime from `GET /api/v1/content/main_info` and sanitized with DOMPurify before rendering, so it can be edited from the admin dashboard without a redeploy. A footer with social links, partner logos, and a copyright line anchors the bottom of the info section.
+
+The background footage video plays unmuted by default; since browsers block autoplay-with-sound, playback falls back to the first user interaction. A mute/unmute button is overlaid on the video.
 
 ### Scripts
 
@@ -91,6 +96,8 @@ Internal dashboard for reviewing community submissions and editing public page c
 
 - **React** — UI component library
 - **Vite** — build tool and dev server with HMR
+- **TipTap** — rich-text editing for page content
+- **react-colorful** — color picker for the text-color control
 - **ESLint** + **Prettier** — code quality and formatting, enforced on every PR
 - **Vitest** — unit testing
 
@@ -123,7 +130,7 @@ The dashboard is gated by the backend's shared admin token (see [Admin authentic
 ### Layout
 
 - **Submissions (left, larger)** — fetches all submission IDs up front, then displays 6 per page with clickable, windowed pagination (at most 5 page numbers plus an ellipsis). Each card shows the submitter's name, email, phone (when provided), full message, and the original filenames of any attachments. Downloading attachments isn't wired up yet.
-- **Edit content (right)** — loads the `main_info` page content into a textarea. **Save** sends `PUT /api/v1/content/main_info`; **Reset** re-fetches the current value.
+- **Edit content (right)** — loads the `main_info` page content into a TipTap rich-text editor with bold/italic/underline, font size, font family, and text color controls. **Save** sends the editor's HTML to `PUT /api/v1/content/main_info`; **Reset** re-fetches the stored value. Save is disabled until the content has been edited.
 
 ### Scripts
 
@@ -211,6 +218,8 @@ BUCKET_NAME=
 `FRONTEND_URL` controls CORS. In `development`, any `http://localhost:<port>` origin is also allowed, so the public frontend and the admin dashboard can both call the API locally without changing the config.
 
 Run `sql/schema.sql` once against a fresh Postgres database before the API can store anything — it's not run automatically. Easiest via Railway's Postgres service → Data/query console → paste and execute the file's contents. It creates the `submissions`, `submission_files`, and `content` tables.
+
+The `content` table ships empty — seed it with the page slugs the site reads (at minimum `main_info`) before the info section will render, e.g. `INSERT INTO content (slug, body) VALUES ('main_info', '');`. The admin editor can update an existing slug's body but does not create new rows.
 
 ### Submission validation & protections
 
