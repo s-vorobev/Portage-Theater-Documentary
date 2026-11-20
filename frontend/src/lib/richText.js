@@ -8,10 +8,7 @@ const ALLOWED_TAGS = ['b', 'strong', 'i', 'em', 'u', 'span', 'br', 'div', 'p']
 const HTML_TAG_RE = /<[a-z][\s\S]*?>/i
 
 function escapeHtml(text) {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 // Converts stored content into safe HTML. Legacy rows were plain text, so when

@@ -6,9 +6,8 @@ vi.mock('../services/mediaService.js', () => ({
 }))
 
 const { getFootage, getFootageMobile } = await import('./mediaController.js')
-const { streamFootage, streamFootageMobile } = await import(
-  '../services/mediaService.js'
-)
+const { streamFootage, streamFootageMobile } =
+  await import('../services/mediaService.js')
 
 function createMockBody() {
   return { on: vi.fn(), pipe: vi.fn() }

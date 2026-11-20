@@ -69,7 +69,10 @@ describe('contentController', () => {
       const req = { params: { slug: 'about' }, body: {} }
       await updateContent(req, makeRes())
 
-      expect(contentService.updateContent).toHaveBeenCalledWith('about', undefined)
+      expect(contentService.updateContent).toHaveBeenCalledWith(
+        'about',
+        undefined,
+      )
     })
   })
 })

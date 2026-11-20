@@ -27,7 +27,11 @@ const SOCIAL_LINKS = [
 
 const PARTNER_LOGOS = [
   { src: '/logos/zmg.webp', alt: 'ZMG', className: 'footer-partner--zmg' },
-  { src: '/logos/4d_model.webp', alt: '4D Model', className: 'footer-partner--4d' },
+  {
+    src: '/logos/4d_model.webp',
+    alt: '4D Model',
+    className: 'footer-partner--4d',
+  },
   { src: '/logos/azw.webp', alt: 'AZW', className: 'footer-partner--azw' },
 ]
 
@@ -71,7 +75,11 @@ function Footer({ reveal }) {
               aria-label={link.name}
               title={link.name}
             >
-              <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg
+                role="img"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <title>{link.name}</title>
                 <path d={link.path} fill="currentColor" />
               </svg>

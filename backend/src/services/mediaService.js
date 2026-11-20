@@ -22,7 +22,9 @@ async function loadMedia(key, rangeHeader) {
 
   const object = await getObjectBody(
     key,
-    range.type === 'satisfiable' ? `bytes=${range.start}-${range.end}` : undefined,
+    range.type === 'satisfiable'
+      ? `bytes=${range.start}-${range.end}`
+      : undefined,
   )
 
   return { size, contentType, range, body: object.Body }

@@ -13,7 +13,8 @@ vi.mock('../config/env.js', () => ({
 }))
 
 const { streamFootage, streamFootageMobile } = await import('./mediaService.js')
-const { getObjectHead, getObjectBody } = await import('../clients/bucketClient.js')
+const { getObjectHead, getObjectBody } =
+  await import('../clients/bucketClient.js')
 
 describe('mediaService', () => {
   beforeEach(() => {

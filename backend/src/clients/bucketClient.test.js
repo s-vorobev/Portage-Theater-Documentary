@@ -50,7 +50,10 @@ describe('bucketClient', () => {
   })
 
   it('heads an object for the given key and bucket', async () => {
-    mockSend.mockResolvedValueOnce({ ContentLength: 123, ContentType: 'video/mp4' })
+    mockSend.mockResolvedValueOnce({
+      ContentLength: 123,
+      ContentType: 'video/mp4',
+    })
 
     const result = await getObjectHead('footage.mp4')
 

@@ -6,7 +6,11 @@ vi.mock('../services/submissionService.js', () => ({
   getSubmissionById: vi.fn(),
 }))
 
-import { submitForm, listSubmissions, getSubmission } from './submissionController.js'
+import {
+  submitForm,
+  listSubmissions,
+  getSubmission,
+} from './submissionController.js'
 import {
   createSubmission,
   listSubmissionIds,

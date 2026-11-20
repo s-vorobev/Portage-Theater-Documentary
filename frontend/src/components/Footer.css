@@ -17,26 +17,26 @@
      ════════════════════════════════════════════════════════════════════ */
 
   /* overall footer box */
-  --footer-pad-x: clamp(1.5rem, 5vw, 4rem);     /* left / right padding */
+  --footer-pad-x: clamp(1.5rem, 5vw, 4rem); /* left / right padding */
   --footer-pad-y: clamp(0.5rem, 1.5vw, 0.9rem); /* top / bottom padding */
-  --footer-gap: clamp(0.4rem, 1vw, 0.7rem);     /* gap: center logo ↔ copyright */
-  --main-gap: clamp(0.75rem, 2vw, 1.5rem);      /* gap: between the 3 columns */
+  --footer-gap: clamp(0.4rem, 1vw, 0.7rem); /* gap: center logo ↔ copyright */
+  --main-gap: clamp(0.75rem, 2vw, 1.5rem); /* gap: between the 3 columns */
 
   /* social icons (left column) */
   --social-icon-size: clamp(2.1rem, 5vw, 3rem); /* icon size */
-  --social-gap: clamp(1.5rem, 4vw, 2.5rem);       /* spacing between icons */
+  --social-gap: clamp(1.5rem, 4vw, 2.5rem); /* spacing between icons */
 
   /* center logo */
-  --brand-height: clamp(4.5rem, 3vw, 6.75rem);      /* logo height (width auto) */
+  --brand-height: clamp(4.5rem, 3vw, 6.75rem); /* logo height (width auto) */
 
   /* partner logos (right column) */
-  --partner-zmg-height: clamp(3.5rem, 6vw, 5rem);      /* ZMG logo (2x) */
-  --partner-4d-height: clamp(3.8rem, 6.6vw, 5.5rem);       /* 4D Model logo (2x) */
+  --partner-zmg-height: clamp(3.5rem, 6vw, 5rem); /* ZMG logo (2x) */
+  --partner-4d-height: clamp(3.8rem, 6.6vw, 5.5rem); /* 4D Model logo (2x) */
   --partner-azw-height: clamp(1.4rem, 2.4vw, 2rem); /* AZW logo (smallest) */
-  --partner-gap: clamp(0.75rem, 2vw, 1.25rem);         /* spacing between logos */
+  --partner-gap: clamp(0.75rem, 2vw, 1.25rem); /* spacing between logos */
 
   /* copyright line */
-  --copyright-size: clamp(0.6rem, 1.6vw, 0.75rem);  /* text size */
+  --copyright-size: clamp(0.6rem, 1.6vw, 0.75rem); /* text size */
   /* ════════════════════════════════════════════════════════════════════ */
 
   position: absolute;
@@ -44,11 +44,7 @@
   right: 0;
   bottom: 0;
   padding: var(--footer-pad-y) var(--footer-pad-x);
-  background: linear-gradient(
-    to bottom,
-    #170a0f,
-    var(--color-bg) 55%
-  );
+  background: linear-gradient(to bottom, #170a0f, var(--color-bg) 55%);
 }
 
 .footer::before {

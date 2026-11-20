@@ -26,11 +26,8 @@ vi.mock('../db/sql/loader.js', () => ({
   },
 }))
 
-const {
-  insertSubmissionWithFiles,
-  getSubmissionIds,
-  getSubmissionWithFiles,
-} = await import('./submissionRepository.js')
+const { insertSubmissionWithFiles, getSubmissionIds, getSubmissionWithFiles } =
+  await import('./submissionRepository.js')
 const { pool } = await import('../db/pool.js')
 
 const submission = {
