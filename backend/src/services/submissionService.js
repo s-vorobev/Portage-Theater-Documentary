@@ -9,6 +9,7 @@ import {
 } from '../repositories/submissionRepository.js'
 import { uploadFile, deleteFile } from '../clients/dropboxClient.js'
 import { toSubmission, toSubmissionFile } from '../mappers/submissionMapper.js'
+import { formatBytes } from '../utils/formatBytes.js'
 import {
   ACCEPTED_FILE_TYPES,
   FALLBACK_EMAIL,
@@ -41,7 +42,7 @@ export async function createSubmission({
   if (totalBytes > UPLOAD_LIMITS.maxTotalSizeBytes) {
     throw new HttpError(
       400,
-      'Total attachments must be under 3GB. Please remove some files.',
+      `Total attachments must be under ${formatBytes(UPLOAD_LIMITS.maxTotalSizeBytes)}. Please remove some files.`,
     )
   }
 

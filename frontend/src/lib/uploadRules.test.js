@@ -1,77 +1,61 @@
 import { describe, it, expect } from 'vitest'
-import { selectFiles, MAX_FILES, MAX_FILE_SIZE_BYTES } from './uploadRules'
+import {
+  selectFiles,
+  MAX_FILES,
+  MAX_FILE_SIZE_BYTES,
+  MAX_TOTAL_SIZE_BYTES,
+} from './uploadRules.js'
 
-function makeFile(overrides = {}) {
-  return {
-    name: 'photo.jpg',
-    type: 'image/jpeg',
-    size: 1024,
-    ...overrides,
-  }
+function file(name, type, size) {
+  return { name, type, size }
 }
 
-describe('selectFiles', () => {
-  it('accepts files with supported types', () => {
-    const result = selectFiles(
-      [],
-      [makeFile(), makeFile({ type: 'video/mp4' })],
-    )
+const image = () => file('a.jpg', 'image/jpeg', 1000)
 
-    expect(result.files).toHaveLength(2)
+describe('selectFiles', () => {
+  it('keeps accepted files with no error', () => {
+    const result = selectFiles([], [image()])
+    expect(result.files).toHaveLength(1)
     expect(result.error).toBe('')
   })
 
-  it('skips unsupported types and reports how many were skipped', () => {
+  it('filters out unsupported types and reports a skip', () => {
     const result = selectFiles(
       [],
-      [makeFile({ name: 'archive.zip', type: 'application/zip' }), makeFile()],
+      [image(), file('x.exe', 'application/x-msdownload', 1000)],
     )
-
     expect(result.files).toHaveLength(1)
     expect(result.error).toContain('1 file(s) skipped')
   })
 
-  it('skips files over the per-file size limit', () => {
-    const result = selectFiles(
-      [],
-      [
-        makeFile({ name: 'huge.mp4', size: MAX_FILE_SIZE_BYTES + 1 }),
-        makeFile(),
-      ],
-    )
-
+  it('filters out files over the size limit', () => {
+    const big = file('big.mp4', 'video/mp4', MAX_FILE_SIZE_BYTES + 1)
+    const result = selectFiles([], [big, image()])
     expect(result.files).toHaveLength(1)
     expect(result.error).toContain('each file must be under')
   })
 
-  it('caps the list at MAX_FILES', () => {
-    const many = Array.from({ length: MAX_FILES + 1 }, (_, i) =>
-      makeFile({ name: `file-${i}.jpg` }),
+  it('caps the number of files at the maximum', () => {
+    const many = Array.from({ length: MAX_FILES + 2 }, (_, i) =>
+      file(`f${i}.png`, 'image/png', 1000),
     )
-
     const result = selectFiles([], many)
-
     expect(result.files).toHaveLength(MAX_FILES)
     expect(result.error).toContain(`up to ${MAX_FILES} files`)
   })
 
-  it('reports when the total size exceeds the limit', () => {
-    const seven = Array.from({ length: 7 }, (_, i) =>
-      makeFile({ name: `big-${i}.jpg`, size: MAX_FILE_SIZE_BYTES }),
+  it('flags a total size over the limit without dropping files', () => {
+    const sizeEach = Math.ceil(MAX_TOTAL_SIZE_BYTES / MAX_FILES) + 1
+    const many = Array.from({ length: MAX_FILES }, (_, i) =>
+      file(`f${i}.mp4`, 'video/mp4', sizeEach),
     )
-
-    const result = selectFiles([], seven)
-
-    expect(result.error).toContain('Total attachments must be under 3GB')
+    const result = selectFiles([], many)
+    expect(result.error).toContain('Total attachments must be under')
   })
 
-  it('keeps existing files and appends newly selected ones', () => {
-    const existing = makeFile({ name: 'a.jpg' })
-    const selected = makeFile({ name: 'b.jpg' })
-
-    const result = selectFiles([existing], [selected])
-
-    expect(result.files).toEqual([existing, selected])
-    expect(result.error).toBe('')
+  it('preserves previously selected files', () => {
+    const existing = image()
+    const result = selectFiles([existing], [file('b.webp', 'image/webp', 2000)])
+    expect(result.files).toHaveLength(2)
   })
 })

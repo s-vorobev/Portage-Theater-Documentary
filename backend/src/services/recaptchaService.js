@@ -1,7 +1,5 @@
 import { env } from '../config/env.js'
-
-const RECAPTCHA_SCORE_THRESHOLD = 0.5
-const EXPECTED_ACTION = 'submit_form'
+import { RECAPTCHA } from '../config/constants.js'
 
 export async function verifyRecaptcha(token) {
   const response = await fetch(
@@ -21,11 +19,11 @@ export async function verifyRecaptcha(token) {
     return { passed: false, reason: 'verification_failed' }
   }
 
-  if (data.action !== EXPECTED_ACTION) {
+  if (data.action !== RECAPTCHA.expectedAction) {
     return { passed: false, reason: 'action_mismatch' }
   }
 
-  if (data.score < RECAPTCHA_SCORE_THRESHOLD) {
+  if (data.score < RECAPTCHA.scoreThreshold) {
     return { passed: false, reason: 'low_score', score: data.score }
   }
 

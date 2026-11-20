@@ -1,12 +1,10 @@
 import { submissionContract } from '../contracts/submissionContract.js'
 import * as submissionService from '../services/submissionService.js'
-
-const DEFAULT_SIZE = 10
-const MAX_SIZE = 100
+import { PAGINATION } from '../config/constants.js'
 
 function parsePagination(query = {}) {
   return {
-    size: clampInt(query.size, DEFAULT_SIZE, 1, MAX_SIZE),
+    size: clampInt(query.size, PAGINATION.defaultSize, 1, PAGINATION.maxSize),
     offset: clampInt(query.offset, 0, 0),
   }
 }

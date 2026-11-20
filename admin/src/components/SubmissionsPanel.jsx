@@ -1,24 +1,7 @@
 import { useEffect, useState } from 'react'
 import { apiFetch, endpoints, fetchAllSubmissionIds } from '../lib/api'
+import { PAGE_SIZE, pageWindow } from '../lib/pagination'
 import './SubmissionsPanel.css'
-
-const PAGE_SIZE = 6
-const PAGE_WINDOW = 5
-
-function pageWindow(current, total) {
-  if (total <= PAGE_WINDOW) {
-    return Array.from({ length: total }, (_, i) => i + 1)
-  }
-
-  const end = Math.min(total, Math.max(current + 2, PAGE_WINDOW))
-  const start = Math.max(1, end - PAGE_WINDOW + 1)
-
-  const items = []
-  if (start > 1) items.push('start-ellipsis')
-  for (let page = start; page <= end; page += 1) items.push(page)
-  if (end < total) items.push('end-ellipsis')
-  return items
-}
 
 function SubmissionCard({ submission }) {
   const { firstName, lastName, email, phone, message, files = [] } = submission

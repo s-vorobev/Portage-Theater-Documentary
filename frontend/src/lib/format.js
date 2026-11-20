@@ -1,3 +1,7 @@
+const KB = 1024
+const MB = 1024 * KB
+const GB = 1024 * MB
+
 export function countWords(text) {
   const trimmed = text.trim()
   if (!trimmed) return 0
@@ -5,8 +9,7 @@ export function countWords(text) {
 }
 
 export function formatBytes(bytes) {
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}KB`
-  if (bytes < 1024 * 1024 * 1024)
-    return `${Math.round(bytes / (1024 * 1024))}MB`
-  return `${Math.round(bytes / (1024 * 1024 * 1024))}GB`
+  if (bytes < MB) return `${Math.round(bytes / KB)}KB`
+  if (bytes < GB) return `${Math.round(bytes / MB)}MB`
+  return `${Math.round(bytes / GB)}GB`
 }

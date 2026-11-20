@@ -1,5 +1,8 @@
 import { formatBytes } from './format'
 
+// Client-side upload rules. These must match the server-side limits in
+// `backend/src/config/constants.js` (UPLOAD_LIMITS, ACCEPTED_FILE_TYPES,
+// VALIDATION).
 export const MAX_MESSAGE_WORDS = 100
 export const MAX_FILES = 10
 export const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024 // 500MB per file
