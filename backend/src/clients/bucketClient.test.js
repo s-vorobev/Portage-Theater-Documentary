@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { mockSend, mockGetSignedUrl, mockGetObjectCommand, s3State } =
+const { mockSend, mockGetObjectCommand, mockHeadObjectCommand, s3State } =
   vi.hoisted(() => ({
     mockSend: vi.fn(),
-    mockGetSignedUrl: vi.fn(),
     mockGetObjectCommand: vi.fn(),
+    mockHeadObjectCommand: vi.fn(),
     s3State: { config: null },
   }))
 
@@ -16,10 +16,9 @@ vi.mock('@aws-sdk/client-s3', () => ({
   GetObjectCommand: mockGetObjectCommand.mockImplementation(function (input) {
     return { input }
   }),
-}))
-
-vi.mock('@aws-sdk/s3-request-presigner', () => ({
-  getSignedUrl: mockGetSignedUrl,
+  HeadObjectCommand: mockHeadObjectCommand.mockImplementation(function (input) {
+    return { input }
+  }),
 }))
 
 vi.mock('../config/env.js', () => ({
@@ -32,7 +31,7 @@ vi.mock('../config/env.js', () => ({
   },
 }))
 
-const { getPresignedUrl } = await import('./bucketClient.js')
+const { getObjectHead, getObjectBody } = await import('./bucketClient.js')
 
 describe('bucketClient', () => {
   beforeEach(() => {
@@ -50,29 +49,49 @@ describe('bucketClient', () => {
     })
   })
 
-  it('presigns a GetObject command for the given key and bucket', async () => {
-    mockGetSignedUrl.mockResolvedValueOnce('https://signed.url/video')
+  it('heads an object for the given key and bucket', async () => {
+    mockSend.mockResolvedValueOnce({
+      ContentLength: 123,
+      ContentType: 'video/mp4',
+    })
 
-    const url = await getPresignedUrl('footage.mp4')
+    const result = await getObjectHead('footage.mp4')
+
+    expect(mockHeadObjectCommand).toHaveBeenCalledWith({
+      Bucket: 'test-bucket',
+      Key: 'footage.mp4',
+    })
+    expect(result).toEqual({ ContentLength: 123, ContentType: 'video/mp4' })
+  })
+
+  it('gets an object without a range by default', async () => {
+    mockSend.mockResolvedValueOnce({ Body: 'stream' })
+
+    const result = await getObjectBody('footage.mp4')
 
     expect(mockGetObjectCommand).toHaveBeenCalledWith({
       Bucket: 'test-bucket',
       Key: 'footage.mp4',
     })
-    expect(mockGetSignedUrl).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        input: { Bucket: 'test-bucket', Key: 'footage.mp4' },
-      }),
-      { expiresIn: 3600 },
-    )
-    expect(url).toBe('https://signed.url/video')
+    expect(result).toEqual({ Body: 'stream' })
   })
 
-  it('propagates a presign failure', async () => {
-    mockGetSignedUrl.mockRejectedValueOnce(new Error('bucket unreachable'))
+  it('gets an object with a range', async () => {
+    mockSend.mockResolvedValueOnce({ Body: 'stream' })
 
-    await expect(getPresignedUrl('footage.mp4')).rejects.toThrow(
+    await getObjectBody('footage.mp4', 'bytes=0-99')
+
+    expect(mockGetObjectCommand).toHaveBeenCalledWith({
+      Bucket: 'test-bucket',
+      Key: 'footage.mp4',
+      Range: 'bytes=0-99',
+    })
+  })
+
+  it('propagates a get failure', async () => {
+    mockSend.mockRejectedValueOnce(new Error('bucket unreachable'))
+
+    await expect(getObjectBody('footage.mp4')).rejects.toThrow(
       'bucket unreachable',
     )
   })

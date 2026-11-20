@@ -1,1 +1,50 @@
-/* TODO: styles for the info section */
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem 10rem;
+  background: radial-gradient(
+    ellipse at center,
+    #0d0608 0%,
+    var(--color-bg) 72%
+  );
+}
+
+.info-content {
+  position: relative;
+  isolation: isolate;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.info-content::before {
+  content: '';
+  position: absolute;
+  inset: -15%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(178, 58, 58, 0.06),
+    transparent 65%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+.info-text {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--color-text);
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.35rem);
+  line-height: 1.7;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .info {
+    padding: 3rem 1.25rem 14rem;
+  }
+}

@@ -1,0 +1,225 @@
+.content-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100vh;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.content-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.content-toolbar-button {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.content-toolbar-button:hover:not(:disabled) {
+  background: var(--color-surface-translucent);
+}
+
+.content-toolbar-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.content-toolbar-bold {
+  font-weight: 700;
+}
+
+.content-toolbar-italic {
+  font-style: italic;
+}
+
+.content-toolbar-underline {
+  text-decoration: underline;
+}
+
+.content-size-control,
+.content-font-control {
+  position: relative;
+}
+
+.content-size-menu,
+.content-font-menu {
+  position: absolute;
+  top: 2.2rem;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 8rem;
+  max-height: 16rem;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.content-size-menu button,
+.content-font-menu button {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--color-text-inverted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.content-size-menu button:hover,
+.content-font-menu button:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.content-color-control {
+  position: relative;
+}
+
+.content-color-swatch {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 3px;
+  border: 1px solid var(--color-border);
+}
+
+.content-color-popover {
+  position: absolute;
+  top: 2.2rem;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.content-color-popover .react-colorful {
+  width: 200px;
+  height: 200px;
+}
+
+.content-color-popover input {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-inverted);
+  font-size: 0.85rem;
+}
+
+.content-color-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.content-color-preset {
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.content-color-preset:hover {
+  transform: scale(1.15);
+}
+
+.content-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-translucent);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-y: auto;
+}
+
+.content-editor:focus-within {
+  outline: 1px solid var(--color-brand-accent);
+}
+
+.content-editor .ProseMirror {
+  flex: 1;
+  outline: none;
+}
+
+.content-editor .ProseMirror:focus {
+  outline: none;
+}
+
+.content-editor p {
+  margin: 0 0 0.5em;
+}
+
+.content-editor p:last-child {
+  margin-bottom: 0;
+}
+
+.content-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.content-button {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.content-button:hover:not(:disabled) {
+  background: var(--color-surface-translucent);
+}
+
+.content-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.content-button-primary {
+  background: var(--color-surface);
+  border-color: var(--color-surface);
+  color: var(--color-brand-accent);
+  font-weight: 700;
+}
+
+.content-button-primary:hover:not(:disabled) {
+  background: var(--color-surface);
+}
+
+.content-status {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}

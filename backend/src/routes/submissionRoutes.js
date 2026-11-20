@@ -1,6 +1,11 @@
 import { Router } from 'express'
 import multer from 'multer'
-import { submitForm } from '../controllers/submissionController.js'
+import {
+  submitForm,
+  listSubmissions,
+  getSubmission,
+} from '../controllers/submissionController.js'
+import { requireAdmin } from '../middleware/requireAdmin.js'
 import { UPLOAD_LIMITS } from '../config/constants.js'
 
 const router = Router()
@@ -18,5 +23,8 @@ router.post(
   upload.array('media', UPLOAD_LIMITS.maxFiles),
   submitForm,
 )
+
+router.get('/submissions', requireAdmin, listSubmissions)
+router.get('/submissions/:id', requireAdmin, getSubmission)
 
 export default router
